@@ -1,5 +1,5 @@
-import pandas as pd
+import pyarrow.parquet as pq
+import pyarrow as pa
 
-URL = "https://huggingface.co/datasets/Carson-Shively/telco-churn/resolve/main/data/bronze/online_bronze.parquet"
-
-df = pd.read_parquet(URL, engine="pyarrow")
+def read_parquet_arrow(path: str) -> pa.Table:
+    return pq.read_table(path)
