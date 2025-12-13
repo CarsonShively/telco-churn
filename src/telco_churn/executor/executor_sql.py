@@ -22,9 +22,6 @@ class SQLExecutor:
         except Exception:
             self.con.execute("ROLLBACK;")
             raise
-    
-    def create_view(self, view_name: str, select_sql: str) -> None:
-        self.execute_script(f"CREATE OR REPLACE VIEW {view_name} AS {select_sql}")
 
     def fetchdf(self, sql: str, params: dict | None = None) -> pd.DataFrame:
         if params is not None:
