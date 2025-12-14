@@ -1,3 +1,5 @@
+description = "Telco Churn"
+
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
@@ -6,6 +8,11 @@ build-backend = "setuptools.build_meta"
 name = "telco-churn"
 version = "0.1.0"
 requires-python = ">=3.10"
+
+dependencies = [
+  "duckdb==1.4.3",
+  "huggingface_hub==1.2.3",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
