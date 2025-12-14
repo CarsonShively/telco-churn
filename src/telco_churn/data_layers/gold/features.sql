@@ -81,9 +81,8 @@ CREATE OR REPLACE MACRO tenure_bucket_id(t) AS (
   END
 );
 
-CREATE OR REPLACE TABLE gold.offline AS
+CREATE OR REPLACE TABLE gold.features AS
 SELECT
-    yn01(churn)                         AS churn,
     customer_id,
 
     senior_citizen,
@@ -152,4 +151,4 @@ SELECT
     flag(internet_service = 'no')          AS no_internet,
     flag(monthly_charges > 80)             AS high_monthly_charges
 
-FROM silver.offline;
+FROM silver.base;
