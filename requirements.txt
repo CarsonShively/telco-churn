@@ -1,4 +1,0 @@
-duckdb==1.4.3
-pandas==2.3.3
-huggingface_hub==1.2.3
-pyarrow==22.0.0
