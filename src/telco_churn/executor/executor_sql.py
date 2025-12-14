@@ -1,10 +1,6 @@
 from dataclasses import dataclass
 from importlib.resources import files
 import duckdb
-import pandas as pd
-import pyarrow as pa
-from typing import Any
-
 
 @dataclass
 class SQLExecutor:
@@ -25,16 +21,9 @@ class SQLExecutor:
             self.con.execute("ROLLBACK;")
             raise
     
-    def fetcharrow(self, sql: str, params: Any = None) -> pa.Table:
-        if params is not None:
-            return self.con.execute(sql, params).fetch_arrow_table()
-        return self.con.execute(sql).fetch_arrow_table()
-    
-    def fetchdf(self, sql: str, params: dict | None = None) -> pd.DataFrame:
-        if params is not None:
-            return self.con.execute(sql, params).fetchdf()
-        return self.con.execute(sql).fetchdf()
+    def write_parquet(self, select_sql: str, out_path: str) -> None:
+        stmt = f"COPY ({select_sql}) TO '{out_path}' (FORMAT PARQUET)"
+        self.execute(stmt)
     
     def count(self, relation: str) -> int:
         return int(self.con.execute(f"SELECT COUNT(*) FROM {relation}").fetchone()[0])
-
