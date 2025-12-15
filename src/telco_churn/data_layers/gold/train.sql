@@ -1,6 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS gold;
 
-CREATE OR REPLACE TABLE gold.training AS
+CREATE OR REPLACE TABLE gold.train AS
 SELECT
   f.*,
   l.churn
