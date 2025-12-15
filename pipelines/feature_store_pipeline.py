@@ -33,7 +33,7 @@ class PipelineConfig:
 
     redis_ttl_seconds: int = int(os.getenv("TELCO_REDIS_TTL_SECONDS", "0"))
 
-    features_table: str = os.getenv("TELCO_FEATURES_TABLE", "gold_features")
+    features_table: str = os.getenv("TELCO_FEATURES_TABLE", "gold.features")
     entity_col: str = os.getenv("TELCO_ENTITY_COL", "customer_id")
 
 
