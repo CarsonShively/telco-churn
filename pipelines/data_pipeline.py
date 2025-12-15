@@ -25,14 +25,14 @@ TRAIN_SQL_FILE = "train.sql"
 class PipelineConfig:
     repo_id: str = os.getenv("TELCO_REPO_ID", "Carson-Shively/telco-churn")
     bronze_hf_path: str = os.getenv("TELCO_BRONZE_HF_PATH", "data/bronze/offline.parquet")
-    train_hf_path: str = os.getenv("TELCO_TRAIN_HF_PATH", "data/gold/training.parquet")
+    train_hf_path: str = os.getenv("TELCO_TRAIN_HF_PATH", "data/gold/train.parquet")
     duckdb_path: str = os.getenv("TELCO_DUCKDB_PATH", ":memory:")
     publish: bool = os.getenv("TELCO_PUBLISH", "0") == "1"
 
 
 def main(cfg: PipelineConfig = PipelineConfig()) -> None:
     repo_root = Path(__file__).resolve().parents[1]
-    out_path = repo_root / "data" / "gold" / "training.parquet"
+    out_path = repo_root / "data" / "gold" / "train.parquet"
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     with duckdb.connect(cfg.duckdb_path) as con:
@@ -46,7 +46,7 @@ def main(cfg: PipelineConfig = PipelineConfig()) -> None:
         ex.execute_script(ex.load_sql(FEATURES_SQL_PKG, FEATURES_SQL_FILE))
         ex.execute_script(ex.load_sql(TRAIN_SQL_PKG, TRAIN_SQL_FILE))
 
-        ex.write_parquet("SELECT * FROM gold.training", str(out_path))
+        ex.write_parquet("SELECT * FROM gold.train", str(out_path))
 
     if cfg.publish:
         upload_parquet(local_path=str(out_path), repo_id=cfg.repo_id, hf_path=cfg.train_hf_path)
