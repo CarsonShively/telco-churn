@@ -25,3 +25,6 @@ huggingface-cli login
 
 Alternatively (for CI/automation), set:
 export HF_TOKEN=hf_...
+
+- `-e .` = run pipelines
+- `-e ".[dev]"` = notebooks + dev tooling
