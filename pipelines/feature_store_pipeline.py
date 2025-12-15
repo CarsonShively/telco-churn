@@ -26,10 +26,14 @@ class PipelineConfig:
     redis_host: str = os.getenv("TELCO_REDIS_HOST", "localhost")
     redis_port: int = int(os.getenv("TELCO_REDIS_PORT", "6379"))
     redis_db: int = int(os.getenv("TELCO_REDIS_DB", "0"))
-    redis_prefix: str = os.getenv("TELCO_REDIS_PREFIX", "telco:features:")
-    redis_ttl_seconds: int = int(os.getenv("TELCO_REDIS_TTL_SECONDS", "0")) 
 
-    features_table: str = os.getenv("TELCO_FEATURES_TABLE", "gold_features")  
+    redis_base_prefix: str = os.getenv("TELCO_REDIS_PREFIX", "telco:features:")
+    redis_current_pointer_key: str = os.getenv("TELCO_REDIS_CURRENT_KEY", "telco:features:CURRENT")
+    redis_run_meta_prefix: str = os.getenv("TELCO_REDIS_RUN_META_PREFIX", "telco:features:RUN_META:")
+
+    redis_ttl_seconds: int = int(os.getenv("TELCO_REDIS_TTL_SECONDS", "0"))
+
+    features_table: str = os.getenv("TELCO_FEATURES_TABLE", "gold_features")
     entity_col: str = os.getenv("TELCO_ENTITY_COL", "customer_id")
 
 
@@ -45,25 +49,34 @@ def main(cfg: PipelineConfig = PipelineConfig()) -> None:
         ex.execute_script(ex.load_sql(BASE_SQL_PKG, BASE_SQL_FILE))
         ex.execute_script(ex.load_sql(FEATURES_SQL_PKG, FEATURES_SQL_FILE))
 
+        ttl: int | None = None if cfg.redis_ttl_seconds <= 0 else cfg.redis_ttl_seconds
+
         r = connect_redis(
             RedisConfig(
                 host=cfg.redis_host,
                 port=cfg.redis_port,
                 db=cfg.redis_db,
-                prefix=cfg.redis_prefix,
-                ttl_seconds=cfg.redis_ttl_seconds,
+                base_prefix=cfg.redis_base_prefix,
+                current_pointer_key=cfg.redis_current_pointer_key,
+                run_meta_prefix=cfg.redis_run_meta_prefix,
+                ttl_seconds=ttl,
             )
         )
 
-        write_to_redis(
+        written, run_prefix = write_to_redis(
             con,
             r,
             table=cfg.features_table,
             entity_col=cfg.entity_col,
-            key_prefix=cfg.redis_prefix,
-            ttl_seconds=cfg.redis_ttl_seconds,  
+            base_prefix=cfg.redis_base_prefix,
+            current_pointer_key=cfg.redis_current_pointer_key,
+            run_meta_prefix=cfg.redis_run_meta_prefix,
+            ttl_seconds=ttl,
             batch_size=1000,
         )
+
+        print(f"Wrote {written} entities to Redis under prefix {run_prefix}")
+
 
 if __name__ == "__main__":
     main()
