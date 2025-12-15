@@ -8,4 +8,4 @@ SELECT
     WHEN lower(trim(Churn)) = 'no'  THEN 0
     ELSE NULL
   END AS churn
-FROM bronze.offline;
+FROM bronze.raw;

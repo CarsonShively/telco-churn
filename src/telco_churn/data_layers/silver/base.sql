@@ -7,7 +7,7 @@ WITH raw AS (
     InternetService, OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport,
     StreamingTV, StreamingMovies, Contract, PaperlessBilling, PaymentMethod,
     SeniorCitizen, tenure, MonthlyCharges, TotalCharges
-  FROM bronze.offline
+  FROM bronze.raw
 ),
 typed AS (
   SELECT
