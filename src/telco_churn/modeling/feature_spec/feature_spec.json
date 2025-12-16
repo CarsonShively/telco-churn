@@ -1,0 +1,49 @@
+{
+  "version": "v20251215T184609Z",
+  "entity_key": "customer_id",
+  "features": [
+    { "name": "customer_id", "dtype": "string", "required": true, "default": "" },
+
+    { "name": "senior_citizen", "dtype": "int", "required": false, "default": 0 },
+    { "name": "tenure", "dtype": "int", "required": false, "default": null },
+    { "name": "monthly_charges", "dtype": "float", "required": false, "default": null },
+    { "name": "total_charges", "dtype": "float", "required": false, "default": null },
+
+    { "name": "gender_id", "dtype": "int", "required": false, "default": -1 },
+    { "name": "partner_id", "dtype": "int", "required": false, "default": 0 },
+    { "name": "dependents_id", "dtype": "int", "required": false, "default": 0 },
+
+    { "name": "phone_service_id", "dtype": "int", "required": false, "default": -1 },
+    { "name": "multiple_lines_id", "dtype": "int", "required": false, "default": -1 },
+
+    { "name": "internet_service_id", "dtype": "int", "required": false, "default": -1 },
+    { "name": "online_security_id", "dtype": "int", "required": false, "default": -1 },
+    { "name": "online_backup_id", "dtype": "int", "required": false, "default": -1 },
+    { "name": "device_protection_id", "dtype": "int", "required": false, "default": -1 },
+    { "name": "tech_support_id", "dtype": "int", "required": false, "default": -1 },
+    { "name": "streaming_tv_id", "dtype": "int", "required": false, "default": -1 },
+    { "name": "streaming_movies_id", "dtype": "int", "required": false, "default": -1 },
+
+    { "name": "contract_term_months", "dtype": "int", "required": false, "default": -1 },
+    { "name": "paperless_billing_id", "dtype": "int", "required": false, "default": -1 },
+    { "name": "payment_method_id", "dtype": "int", "required": false, "default": -1 },
+
+    { "name": "num_services", "dtype": "int", "required": false, "default": 0 },
+    { "name": "num_addon_services", "dtype": "int", "required": false, "default": 0 },
+    { "name": "security_bundle", "dtype": "int", "required": false, "default": 0 },
+    { "name": "tech_bundle", "dtype": "int", "required": false, "default": 0 },
+
+    { "name": "charges_per_month", "dtype": "float", "required": false, "default": null },
+    { "name": "charges_ratio", "dtype": "float", "required": false, "default": null },
+    { "name": "addon_service_ratio", "dtype": "float", "required": false, "default": null },
+
+    { "name": "tenure_bucket_id", "dtype": "int", "required": false, "default": -1 },
+    { "name": "short_tenure", "dtype": "int", "required": false, "default": 0 },
+    { "name": "long_tenure", "dtype": "int", "required": false, "default": 0 },
+    { "name": "is_month_to_month", "dtype": "int", "required": false, "default": 0 },
+
+    { "name": "has_fiber", "dtype": "int", "required": false, "default": 0 },
+    { "name": "no_internet", "dtype": "int", "required": false, "default": 0 },
+    { "name": "high_monthly_charges", "dtype": "int", "required": false, "default": 0 }
+  ]
+}
