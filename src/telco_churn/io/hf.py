@@ -28,3 +28,36 @@ def upload_parquet(
         repo_type="dataset",
         commit_message=commit_message or f"Upload {hf_path}",
     )
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Optional
+from huggingface_hub import HfApi
+
+
+def upload_bundle(
+    bundle_dir: str | Path,
+    *,
+    repo_id: str,
+    modeltype: str,
+    revision: str = "main",
+    commit_message: Optional[str] = None,
+) -> None:
+    p = Path(bundle_dir)
+    if not p.exists() or not p.is_dir():
+        raise FileNotFoundError(f"Bundle directory not found: {p}")
+
+    files = [x for x in p.iterdir() if x.is_file()]
+    if not files:
+        raise ValueError(f"No files found in bundle directory: {p}")
+
+    api = HfApi()
+    api.upload_folder(
+        folder_path=str(p),
+        repo_id=repo_id,
+        repo_type="model",
+        revision=revision,
+        path_in_repo=f"candidates/{modeltype}",
+        commit_message=commit_message or f"Upload candidates/{modeltype} bundle",
+    )
