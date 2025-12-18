@@ -1,6 +1,7 @@
+from __future__ import annotations
 from pathlib import Path
 from huggingface_hub import hf_hub_download, HfApi
-
+from typing import Optional
 
 def download_from_hf(repo_id: str, filename: str, revision: str = "main") -> str:
     return hf_hub_download(
@@ -28,13 +29,6 @@ def upload_parquet(
         repo_type="dataset",
         commit_message=commit_message or f"Upload {hf_path}",
     )
-
-from __future__ import annotations
-
-from pathlib import Path
-from typing import Optional
-from huggingface_hub import HfApi
-
 
 def upload_bundle(
     bundle_dir: str | Path,
