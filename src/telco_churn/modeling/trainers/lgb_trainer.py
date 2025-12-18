@@ -34,16 +34,16 @@ class LGBTrainer:
 
     def suggest_params(self, trial: optuna.Trial) -> dict:
         return {
-            "clf__n_estimators": trial.suggest_int("n_estimators", 300, 3000),
-            "clf__learning_rate": trial.suggest_float("learning_rate", 0.01, 0.2, log=True),
-            "clf__num_leaves": trial.suggest_int("num_leaves", 16, 256),
-            "clf__max_depth": trial.suggest_int("max_depth", -1, 12), 
-            "clf__min_child_samples": trial.suggest_int("min_child_samples", 10, 200),
-            "clf__subsample": trial.suggest_float("subsample", 0.6, 1.0),
-            "clf__subsample_freq": trial.suggest_int("subsample_freq", 0, 10),
-            "clf__colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
-            "clf__reg_lambda": trial.suggest_float("reg_lambda", 1e-3, 100.0, log=True),
-            "clf__reg_alpha": trial.suggest_float("reg_alpha", 1e-3, 100.0, log=True),
-            "clf__min_split_gain": trial.suggest_float("min_split_gain", 0.0, 5.0),
-            "clf__scale_pos_weight": trial.suggest_float("scale_pos_weight", 0.5, 20.0, log=True),
+            "clf__n_estimators": trial.suggest_int("clf__n_estimators", 300, 3000),
+            "clf__learning_rate": trial.suggest_float("clf__learning_rate", 0.01, 0.2, log=True),
+            "clf__num_leaves": trial.suggest_int("clf__num_leaves", 16, 256),
+            "clf__max_depth": trial.suggest_int("clf__max_depth", -1, 12),
+            "clf__min_child_samples": trial.suggest_int("clf__min_child_samples", 10, 200),
+            "clf__subsample": trial.suggest_float("clf__subsample", 0.6, 1.0),
+            "clf__subsample_freq": trial.suggest_int("clf__subsample_freq", 0, 10),
+            "clf__colsample_bytree": trial.suggest_float("clf__colsample_bytree", 0.6, 1.0),
+            "clf__reg_lambda": trial.suggest_float("clf__reg_lambda", 1e-3, 100.0, log=True),
+            "clf__reg_alpha": trial.suggest_float("clf__reg_alpha", 1e-3, 100.0, log=True),
+            "clf__min_split_gain": trial.suggest_float("clf__min_split_gain", 0.0, 5.0),
+            "clf__scale_pos_weight": trial.suggest_float("clf__scale_pos_weight", 0.5, 20.0, log=True),
         }

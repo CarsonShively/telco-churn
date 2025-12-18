@@ -26,14 +26,13 @@ class LRTrainer:
                     solver="saga",
                     max_iter=2000,
                     random_state=self.seed,
-                    n_jobs=-1,
                 )),
             ]
         )
 
     def suggest_params(self, trial: optuna.Trial) -> dict:
         return {
-            "clf__C": trial.suggest_float("C", 1e-4, 1e2, log=True),
-            "clf__l1_ratio": trial.suggest_float("l1_ratio", 0.0, 1.0),
-            "clf__class_weight": trial.suggest_categorical("class_weight", [None, "balanced"]),
+            "clf__C": trial.suggest_float("clf__C", 1e-4, 1e2, log=True),
+            "clf__l1_ratio": trial.suggest_float("clf__l1_ratio", 0.0, 1.0),
+            "clf__class_weight": trial.suggest_categorical("clf__class_weight", [None, "balanced"]),
         }

@@ -32,16 +32,16 @@ class XGBTrainer:
 
     def suggest_params(self, trial: optuna.Trial) -> dict:
         return {
-            "clf__n_estimators": trial.suggest_int("n_estimators", 300, 2000),
-            "clf__learning_rate": trial.suggest_float("learning_rate", 0.01, 0.2, log=True),
-            "clf__grow_policy": trial.suggest_categorical("grow_policy", ["depthwise", "lossguide"]),
-            "clf__max_depth": trial.suggest_int("max_depth", 3, 8),
-            "clf__max_leaves": trial.suggest_int("max_leaves", 16, 256),
-            "clf__min_child_weight": trial.suggest_float("min_child_weight", 1.0, 20.0, log=True),
-            "clf__subsample": trial.suggest_float("subsample", 0.6, 1.0),
-            "clf__colsample_bytree": trial.suggest_float("colsample_bytree", 0.6, 1.0),
-            "clf__reg_lambda": trial.suggest_float("reg_lambda", 1e-3, 100.0, log=True),
-            "clf__reg_alpha": trial.suggest_float("reg_alpha", 1e-3, 100.0, log=True),
-            "clf__gamma": trial.suggest_float("gamma", 0.0, 5.0),
-            "clf__scale_pos_weight": trial.suggest_float("scale_pos_weight", 0.5, 20.0, log=True),
+            "clf__n_estimators": trial.suggest_int("clf__n_estimators", 300, 2000),
+            "clf__learning_rate": trial.suggest_float("clf__learning_rate", 0.01, 0.2, log=True),
+            "clf__grow_policy": trial.suggest_categorical("clf__grow_policy", ["depthwise", "lossguide"]),
+            "clf__max_depth": trial.suggest_int("clf__max_depth", 3, 8),
+            "clf__max_leaves": trial.suggest_int("clf__max_leaves", 16, 256),
+            "clf__min_child_weight": trial.suggest_float("clf__min_child_weight", 1.0, 20.0, log=True),
+            "clf__subsample": trial.suggest_float("clf__subsample", 0.6, 1.0),
+            "clf__colsample_bytree": trial.suggest_float("clf__colsample_bytree", 0.6, 1.0),
+            "clf__reg_lambda": trial.suggest_float("clf__reg_lambda", 1e-3, 100.0, log=True),
+            "clf__reg_alpha": trial.suggest_float("clf__reg_alpha", 1e-3, 100.0, log=True),
+            "clf__gamma": trial.suggest_float("clf__gamma", 0.0, 5.0),
+            "clf__scale_pos_weight": trial.suggest_float("clf__scale_pos_weight", 0.5, 20.0, log=True),
         }
