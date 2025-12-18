@@ -8,7 +8,7 @@ from sklearn.pipeline import Pipeline
 
 from telco_churn.modeling.feature_spec.feature_spec import FeatureSpecTransformer
 from telco_churn.modeling.feature_spec.load_spec import load_feature_spec
-from telco_churn.modeling.preprocessors import lr_preprocessor
+from telco_churn.modeling.preprocessors.lr_preprocessor import lr_preprocessor
 
 
 @dataclass(slots=True)
@@ -22,24 +22,18 @@ class LRTrainer:
             steps=[
                 ("spec", FeatureSpecTransformer(self.spec, drop_columns=[id_col])),
                 ("pre", lr_preprocessor()),
-                ("clf", LogisticRegression(max_iter=2000, random_state=self.seed)),
+                ("clf", LogisticRegression(
+                    solver="saga",
+                    max_iter=2000,
+                    random_state=self.seed,
+                    n_jobs=-1,
+                )),
             ]
         )
 
     def suggest_params(self, trial: optuna.Trial) -> dict:
-        solver = "saga"
-
-        penalty = trial.suggest_categorical("penalty", ["l2", "l1", "elasticnet"])
-        l1_ratio = trial.suggest_float("l1_ratio", 0.05, 0.95) if penalty == "elasticnet" else None
-
-        params = {
+        return {
             "clf__C": trial.suggest_float("C", 1e-4, 1e2, log=True),
-            "clf__solver": solver,
-            "clf__penalty": penalty,
+            "clf__l1_ratio": trial.suggest_float("l1_ratio", 0.0, 1.0),
             "clf__class_weight": trial.suggest_categorical("class_weight", [None, "balanced"]),
         }
-
-        if l1_ratio is not None:
-            params["clf__l1_ratio"] = l1_ratio
-
-        return params
