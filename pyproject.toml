@@ -12,7 +12,13 @@ requires-python = ">=3.10"
 dependencies = [
   "duckdb==1.4.3",
   "huggingface_hub==1.2.3",
-  "redis==7.1.0"
+  "redis==7.1.0",
+  "pandas==2.3.3",
+  "sklearn==1.8.0",
+  "optuna==4.6.0",
+  "numpy==2.3.5",
+  "xgboost==3.1.2",
+  "lightgbm==4.6.0",
 ]
 
 [tool.setuptools]
@@ -22,11 +28,10 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-telco_churn = ["**/*.sql"]
+telco_churn = ["**/*.sql", "**/*.json"]
 
 [project.optional-dependencies]
 dev = [
   "jupyter",
   "ipykernel",
-  "pandas",
 ]
