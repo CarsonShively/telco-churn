@@ -2,6 +2,10 @@
 data/**
 !data/.gitkeep
 
+# ---- model artifacts (generated) ----
+artifacts/**
+!artifacts/.gitkeep
+
 # ---- virtual environments ----
 _venv/
 .venv/
