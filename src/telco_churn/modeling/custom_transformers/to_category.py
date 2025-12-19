@@ -1,3 +1,7 @@
+# switch lgb back to df type category
+# figure out array vs df, sparse vs dense, feature names and output format
+# look at actual gold features and figure out spec and prerpocess correctness
+
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 
