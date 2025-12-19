@@ -47,14 +47,6 @@ def tune_optuna_cv(
             pipe.set_params(**params)
             pipe.fit(X_tr, y_tr)
             
-            # ===== debug ========
-            try:
-                _ = pipe.predict_proba(X_va)
-            except Exception as e:
-                raise RuntimeError(f"predict_proba failed in fold {i} with params={params}") from e
-            # ====================
-       
-
             score = float(primary_metric(pipe, X_va, y_va))
             fold_scores.append(score)
 
