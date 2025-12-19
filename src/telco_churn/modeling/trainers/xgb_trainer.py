@@ -8,7 +8,7 @@ from xgboost import XGBClassifier
 
 from telco_churn.modeling.feature_spec.feature_spec import FeatureSpecTransformer
 from telco_churn.modeling.feature_spec.load_spec import load_feature_spec
-from telco_churn.modeling.preprocessors import xgb_preprocessor
+from telco_churn.modeling.preprocessors.xgb_preprocessor import xgb_preprocessor
 
 
 @dataclass(slots=True)
