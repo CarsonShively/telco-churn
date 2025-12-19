@@ -105,7 +105,11 @@ def main(cfg: TrainPipelineConfig, *, modeltype: str) -> None:
         cfg=cfg,
     )
 
-    upload_bundle(bundle, repo_id=cfg.repo_id, modeltype=modeltype)
+    try:
+        upload_bundle(bundle, repo_id=cfg.repo_id, modeltype=modeltype)
+    except Exception as e:
+        print(f"[WARN] Upload failed: {e}\nBundle is saved locally; you can retry upload later.")
+
 
 
 if __name__ == "__main__":
