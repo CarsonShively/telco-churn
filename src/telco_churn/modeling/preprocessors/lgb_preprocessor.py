@@ -1,9 +1,8 @@
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from telco_churn.modeling.custom_transformers.to_category import ToCategory
-from sklearn.base import BaseEstimator, TransformerMixin
-import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
+
 
 def lgb_preprocessor() -> ColumnTransformer:
     cat_cols = [
@@ -29,7 +28,7 @@ def lgb_preprocessor() -> ColumnTransformer:
 
     cat_pipe = Pipeline(steps=[
         ("imputer", SimpleImputer(strategy="most_frequent")),
-        ("to_category", ToCategory()),
+        ("ohe", OneHotEncoder(handle_unknown="ignore")),
     ])
 
     num_pipe = Pipeline(steps=[
