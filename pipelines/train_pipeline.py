@@ -121,6 +121,11 @@ def main(cfg: TrainPipelineConfig, *, modeltype: str, upload: bool = False) -> N
         direction=cfg.direction,
         cfg=cfg,
     )
+    
+    required = ["model.joblib", "metrics.json", "metadata.json"]
+    missing = [name for name in required if not (Path(bundle_dir) / name).exists()]
+    if missing:
+        raise FileNotFoundError(f"Bundle missing required files: {missing} in {bundle_dir}")
 
     if upload:
         try:
