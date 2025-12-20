@@ -27,6 +27,7 @@ def assemble_metrics_payload(
         "cv": cv_summary,
         "holdout": holdout_metrics,
     }
+    return payload
 
 
 def write_metrics_json(bundle_dir: Path, payload: Dict[str, Any]) -> Path:
