@@ -25,7 +25,7 @@ class TrainPipelineConfig:
 
     seed: int = env_int("TELCO_SEED", 42)
     cv_splits: int = env_int("TELCO_CV_SPLITS", 5)
-    n_trials: int = env_int("TELCO_N_TRIALS", 50)
+    n_trials: int = env_int("TELCO_N_TRIALS", 250)
 
     primary_metric: str = env_str("TELCO_PRIMARY_METRIC", "average_precision")
     direction: str = env_choice("TELCO_DIRECTION", "maximize", {"maximize", "minimize"})
