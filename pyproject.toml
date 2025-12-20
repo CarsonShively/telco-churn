@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 
 dependencies = [
   "duckdb==1.4.3",
-  "huggingface-hub[cli]",
+  "huggingface-hub[cli]>=0.20",
   "redis==7.1.0",
   "pandas==2.3.3",
   "scikit-learn==1.8.0",
