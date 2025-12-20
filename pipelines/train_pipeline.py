@@ -1,16 +1,18 @@
 import argparse
 from dataclasses import dataclass
-
+from pathlib import Path
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
 from telco_churn.io.hf import download_from_hf, upload_bundle
 from telco_churn.modeling.dataframe.train_to_df import parquet_to_df
 from telco_churn.modeling.metrics.metric_report import project_metric_report
-from telco_churn.modeling.create_bundle import create_bundle_overwrite
+from telco_churn.modeling.assemble_bundle.assemble_bundle import write_bundle
 from telco_churn.modeling.optuna import tune_optuna_cv
 from telco_churn.modeling.train_pipeline_ops import fit_best, evaluate
 from telco_churn.modeling.trainers.make_trainer import make_trainer, available_trainers
 from telco_churn.env_utils.helpers import env_str, env_int, env_float, env_choice
+from telco_churn.modeling.run_id import make_run_id
+from telco_churn.modeling.assemble_bundle.assemble_artifact import ModelArtifact
 
 @dataclass(frozen=True)
 class TrainPipelineConfig:
@@ -32,10 +34,17 @@ class TrainPipelineConfig:
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser()
     p.add_argument("--modeltype", required=True, choices=available_trainers())
+    p.add_argument(
+        "--upload",
+        action="store_true",
+        help="Upload the run bundle to Hugging Face after training",
+    )
     return p.parse_args()
 
 
-def main(cfg: TrainPipelineConfig, *, modeltype: str) -> None:
+def main(cfg: TrainPipelineConfig, *, modeltype: str, upload: bool = False) -> None:
+    run_id = make_run_id()
+    
     metrics = project_metric_report()
 
     if cfg.primary_metric not in metrics:
@@ -92,27 +101,41 @@ def main(cfg: TrainPipelineConfig, *, modeltype: str) -> None:
         metrics=metrics,
         threshold=cfg.threshold,
     )
-
-    bundle = create_bundle_overwrite(
+    
+    artifact_obj = ModelArtifact(
+        run_id=run_id,
+        model_type=modeltype,
         model=artifact,
-        model_name=modeltype,
+        threshold=cfg.threshold,
+    )
+    
+    bundle_dir = Path("artifacts/runs") / run_id
+
+    bundle_dir = write_bundle(
+        bundle_dir=bundle_dir,
+        artifact_obj=artifact_obj,
         best_params=best_params,
         cv_summary=cv_summary,
         holdout_metrics=holdout_metrics,
         primary_metric=cfg.primary_metric,
         direction=cfg.direction,
-        threshold=cfg.threshold,
         cfg=cfg,
     )
 
-    try:
-        upload_bundle(bundle, repo_id=cfg.repo_id, modeltype=modeltype)
-    except Exception as e:
-        print(f"[WARN] Upload failed: {e}\nBundle is saved locally; you can retry upload later.")
-
-
+    if upload:
+        try:
+            upload_bundle(
+                bundle_dir=bundle_dir,
+                repo_id=cfg.repo_id,
+                run_id=run_id,
+                revision=cfg.revision,
+            )
+        except Exception as e:
+            print(f"[WARN] Upload failed: {e}\nBundle is saved locally; you can retry upload later.")
+    else:
+        print("[INFO] Skipping upload (run bundle saved locally).")
 
 if __name__ == "__main__":
     args = parse_args()
     cfg = TrainPipelineConfig()
-    main(cfg, modeltype=args.modeltype)
+    main(cfg, modeltype=args.modeltype, upload=args.upload)
