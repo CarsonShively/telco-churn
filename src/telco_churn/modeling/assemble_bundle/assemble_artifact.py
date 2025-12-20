@@ -7,4 +7,3 @@ class ModelArtifact:
     model_type: str
     model: Any
     threshold: float = 0.5
-    feature_spec: Optional[Dict[str, Any]] = None

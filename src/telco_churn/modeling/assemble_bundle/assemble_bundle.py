@@ -44,7 +44,6 @@ def write_bundle(
         model_type=artifact_obj.model_type,
         best_params=best_params,
         cfg=cfg,
-        feature_spec=artifact_obj.feature_spec,
     )
     write_metadata_json(bundle_dir, meta_payload)
 
