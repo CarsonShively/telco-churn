@@ -139,13 +139,3 @@ def fetch_champion_pointer(
         return None
 
     return json.loads(Path(p).read_text(encoding="utf-8"))
-
-def temp_download_from_hf(repo_id: str, filename: str, revision: str = "main", repo_type: str = "model",) -> str:
-    return hf_hub_download(
-        repo_id=repo_id,
-        repo_type=repo_type,
-        filename=filename,
-        repo_type="model",
-        revision=revision,
-    )
-    
