@@ -139,3 +139,4 @@ def fetch_champion_pointer(
         return None
 
     return json.loads(Path(p).read_text(encoding="utf-8"))
+
