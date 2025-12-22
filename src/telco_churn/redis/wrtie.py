@@ -9,6 +9,17 @@ import redis
 from telco_churn.redis.config import RedisConfig, make_run_prefix, make_entity_key
 
 
+def atomic_write_text(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    tmp.replace(path)
+
+def atomic_write_json(path: Path, obj: Any) -> None:
+    text = json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    atomic_write_text(path, text)
+
+
 def write_to_redis(
     con: duckdb.DuckDBPyConnection,
     r: redis.Redis,
