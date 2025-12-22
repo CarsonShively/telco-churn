@@ -1,3 +1,5 @@
+-- gold.features: feature engineering layer built from silver.base; defines helper macros and encodes categories to numeric features.
+
 CREATE SCHEMA IF NOT EXISTS gold;
 
 CREATE OR REPLACE MACRO flag(expr) AS (

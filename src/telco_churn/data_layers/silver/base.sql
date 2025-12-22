@@ -1,3 +1,5 @@
+-- silver.base: normalized, validated, and deduplicated customer table built from bronze.raw.
+
 CREATE SCHEMA IF NOT EXISTS silver;
 
 CREATE OR REPLACE TABLE silver.base AS
@@ -11,7 +13,7 @@ WITH raw AS (
 ),
 typed AS (
   SELECT
-    lower(trim(customerID))       AS customer_id,
+    trim(customerID)       AS customer_id,
     lower(trim(gender))           AS gender,
     lower(trim(Partner))          AS partner,
     lower(trim(Dependents))       AS dependents,
