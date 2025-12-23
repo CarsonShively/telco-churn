@@ -31,6 +31,13 @@ FEATURES_SQL_FILE = "features.sql"
 TRAIN_SQL_FILE = "train.sql"
 
 
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser()
+    p.add_argument("--upload", action="store_true")
+    p.add_argument("--log-level", default="INFO")
+    return p.parse_args()
+
+
 def main(*, upload: bool) -> None:
     """Run the training dataset build pipeline and optionally upload the output parquet to HF."""
     t0 = perf_counter()
@@ -41,57 +48,54 @@ def main(*, upload: bool) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     log.info("Output parquet: %s", out_path)
 
+    with duckdb.connect(DUCKDB_PATH) as con:
+        ex = SQLExecutor(con)
+
+        log.info("Downloading bronze: repo=%s file=%s", REPO_ID, BRONZE_OFFLINE_PARQUET)
+        local_bronze = download_dataset_hf(repo_id=REPO_ID, filename=BRONZE_OFFLINE_PARQUET)
+        log.info("Bronze local path: %s", local_bronze)
+
+        log.info("Building bronze")
+        build_bronze(con, local_bronze)
+
+        log.info("Running SQL stage: base")
+        ex.execute_script(ex.load_sql(SILVER_SQL_PKG, BASE_SQL_FILE))
+
+        log.info("Running SQL stage: label")
+        ex.execute_script(ex.load_sql(SILVER_SQL_PKG, LABEL_SQL_FILE))
+
+        log.info("Running SQL stage: features")
+        ex.execute_script(ex.load_sql(GOLD_SQL_PKG, FEATURES_SQL_FILE))
+
+        log.info("Running SQL stage: train")
+        ex.execute_script(ex.load_sql(GOLD_SQL_PKG, TRAIN_SQL_FILE))
+
+        nrows = con.execute("SELECT COUNT(*) FROM gold.train").fetchone()[0]
+        log.info("gold.train rows: %s", nrows)
+
+        if nrows == 0:
+            raise RuntimeError("gold.train is empty (0 rows)")
+
+        log.info("Writing parquet")
+        ex.write_parquet("SELECT * FROM gold.train", str(out_path))
+
+    if out_path.exists():
+        log.info("Wrote parquet size_bytes=%s", out_path.stat().st_size)
+
+    if upload:
+        log.info("Uploading to HF: repo=%s dest=%s", REPO_ID, GOLD_TRAIN_PARQUET)
+        upload_dataset_hf(local_path=str(out_path), repo_id=REPO_ID, hf_path=GOLD_TRAIN_PARQUET)
+        log.info("Upload complete")
+
+    log.info("build_train done in %.2fs", perf_counter() - t0)
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    setup_logging(args.log_level)
+
     try:
-        with duckdb.connect(DUCKDB_PATH) as con:
-            ex = SQLExecutor(con)
-
-            log.info("Downloading bronze: repo=%s file=%s", REPO_ID, BRONZE_OFFLINE_PARQUET)
-            local_bronze = download_dataset_hf(repo_id=REPO_ID, filename=BRONZE_OFFLINE_PARQUET)
-            log.info("Bronze local path: %s", local_bronze)
-
-            log.info("Building bronze")
-            build_bronze(con, local_bronze)
-
-            log.info("Running SQL stage: base")
-            ex.execute_script(ex.load_sql(SILVER_SQL_PKG, BASE_SQL_FILE))
-
-            log.info("Running SQL stage: label")
-            ex.execute_script(ex.load_sql(SILVER_SQL_PKG, LABEL_SQL_FILE))
-
-            log.info("Running SQL stage: features")
-            ex.execute_script(ex.load_sql(GOLD_SQL_PKG, FEATURES_SQL_FILE))
-
-            log.info("Running SQL stage: train")
-            ex.execute_script(ex.load_sql(GOLD_SQL_PKG, TRAIN_SQL_FILE))
-
-            nrows = con.execute("SELECT COUNT(*) FROM gold.train").fetchone()[0]
-            log.info("gold.train rows: %s", nrows)
-
-            if nrows == 0:
-                raise RuntimeError("gold.train is empty (0 rows)")
-
-            log.info("Writing parquet")
-            ex.write_parquet("SELECT * FROM gold.train", str(out_path))
-
-        if out_path.exists():
-            log.info("Wrote parquet size_bytes=%s", out_path.stat().st_size)
-
-        if upload:
-            log.info("Uploading to HF: repo=%s dest=%s", REPO_ID, GOLD_TRAIN_PARQUET)
-            upload_dataset_hf(local_path=str(out_path), repo_id=REPO_ID, hf_path=GOLD_TRAIN_PARQUET)
-            log.info("Upload complete")
-
-        log.info("build_train done in %.2fs", perf_counter() - t0)
-
+        main(upload=args.upload)
     except Exception:
         log.exception("build_train failed")
         raise
-
-if __name__ == "__main__":
-    p = argparse.ArgumentParser()
-    p.add_argument("--log-level", default="INFO")
-    p.add_argument("--upload", action="store_true")
-    args = p.parse_args()
-
-    setup_logging(args.log_level)
-    main(upload=args.upload)

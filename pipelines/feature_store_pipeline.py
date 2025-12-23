@@ -42,67 +42,67 @@ def main() -> None:
     t0 = perf_counter()
     log.info("pipeline start")
 
-    try:
-        with duckdb.connect(DUCKDB_PATH) as con:
-            ex = SQLExecutor(con)
+    with duckdb.connect(DUCKDB_PATH) as con:
+        ex = SQLExecutor(con)
 
-            log.info("Downloading bronze data")
-            local_path = download_dataset_hf(
-                repo_id=REPO_ID,
-                filename=BRONZE_ONLINE_PARQUET,
-            )
+        log.info("Downloading bronze data")
+        local_path = download_dataset_hf(
+            repo_id=REPO_ID,
+            filename=BRONZE_ONLINE_PARQUET,
+        )
 
-            log.info("Building bronze tables")
-            build_bronze(con, local_path)
+        log.info("Building bronze tables")
+        build_bronze(con, local_path)
 
-            log.info("Running SQL stage: base")
-            ex.execute_script(ex.load_sql(SILVER_SQL_PKG, BASE_SQL_FILE))
+        log.info("Running SQL stage: base")
+        ex.execute_script(ex.load_sql(SILVER_SQL_PKG, BASE_SQL_FILE))
 
-            log.info("Running SQL stage: features")
-            ex.execute_script(ex.load_sql(GOLD_SQL_PKG, FEATURES_SQL_FILE))
+        log.info("Running SQL stage: features")
+        ex.execute_script(ex.load_sql(GOLD_SQL_PKG, FEATURES_SQL_FILE))
 
-            ttl: int | None = None if REDIS_TTL_SECONDS <= 0 else REDIS_TTL_SECONDS
+        ttl: int | None = None if REDIS_TTL_SECONDS <= 0 else REDIS_TTL_SECONDS
 
-            log.info("Connecting to Redis")
-            redis_cfg = RedisConfig(
-                host=REDIS_HOST,
-                port=REDIS_PORT,
-                db=REDIS_DB,
-                base_prefix=REDIS_BASE_PREFIX,
-                current_pointer_key=REDIS_CURRENT_POINTER_KEY,
-                run_meta_prefix=REDIS_RUN_META_PREFIX,
-                ttl_seconds=ttl,
-            )
+        log.info("Connecting to Redis")
+        redis_cfg = RedisConfig(
+            host=REDIS_HOST,
+            port=REDIS_PORT,
+            db=REDIS_DB,
+            base_prefix=REDIS_BASE_PREFIX,
+            current_pointer_key=REDIS_CURRENT_POINTER_KEY,
+            run_meta_prefix=REDIS_RUN_META_PREFIX,
+            ttl_seconds=ttl,
+        )
 
-            r = connect_redis(redis_cfg)
+        r = connect_redis(redis_cfg)
 
-            log.info(
-                "Writing features to Redis (table=%s, batch_size=%s)",
-                FEATURES_TABLE,
-                REDIS_WRITE_BATCH_SIZE,
-            )
+        log.info(
+            "Writing features to Redis (table=%s, batch_size=%s)",
+            FEATURES_TABLE,
+            REDIS_WRITE_BATCH_SIZE,
+        )
 
-            written, run_prefix = write_to_redis(
-                con,
-                r,
-                cfg=redis_cfg,
-                table=FEATURES_TABLE,
-                entity_col=ENTITY_COL,
-                batch_size=REDIS_WRITE_BATCH_SIZE,
-            )
+        written, run_prefix = write_to_redis(
+            con,
+            r,
+            cfg=redis_cfg,
+            table=FEATURES_TABLE,
+            entity_col=ENTITY_COL,
+            batch_size=REDIS_WRITE_BATCH_SIZE,
+        )
 
-            log.info(
-                "Redis write complete: entities=%s, run_prefix=%s",
-                written,
-                run_prefix,
-            )
+        log.info(
+            "Redis write complete: entities=%s, run_prefix=%s",
+            written,
+            run_prefix,
+        )
 
-        log.info("pipeline completed in %.2fs", perf_counter() - t0)
+    log.info("pipeline completed in %.2fs", perf_counter() - t0)
 
-    except Exception:
-        log.exception("pipeline failed")
-        raise
 
 if __name__ == "__main__":
     setup_logging("INFO")
-    main()
+    try:
+        main()
+    except Exception:
+        log.exception("pipeline failed")
+        raise
