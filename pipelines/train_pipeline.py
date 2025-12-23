@@ -1,3 +1,12 @@
+"""Train a churn model and write a run bundle.
+
+Steps:
+- Download gold train parquet from Hugging Face
+- Train with Optuna CV, fit best model, evaluate holdout
+- Write model.joblib, metrics.json, metadata.json
+- Optionally upload the bundle to Hugging Face
+"""
+
 import argparse
 import logging
 from pathlib import Path
@@ -52,6 +61,7 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 def main(*, modeltype: str, upload: bool = False) -> None:
+    """Train the specified model type and optionally upload the resulting run bundle."""
     t0 = perf_counter()
     run_id = make_run_id()
 
@@ -186,8 +196,9 @@ def main(*, modeltype: str, upload: bool = False) -> None:
 if __name__ == "__main__":
     args = parse_args()
     setup_logging(args.log_level)
+    # Silence sklearn warning caused by LightGBM seeing DataFrame feature names during fit
+    # and NumPy arrays during CV/eval. Safe for this project because column order is stable.
     warnings.filterwarnings(
-        """This project prioritises overall feature structure, other projects demonstrate feature explainability through the model."""
         "ignore",
         message=r"X does not have valid feature names, but LGBMClassifier was fitted with feature names",
         category=UserWarning,
