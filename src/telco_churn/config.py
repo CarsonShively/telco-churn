@@ -24,8 +24,3 @@ FEATURES_TABLE = "gold.features"
 ENTITY_COL = "customer_id"
 
 TRAIN_HF_PATH = GOLD_TRAIN_PARQUET
-TARGET_COL = "churn"
-
-PRIMARY_METRIC = "average_precision"
-METRIC_DIRECTION = "maximize"
-DEFAULT_THRESHOLD = 0.5
