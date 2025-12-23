@@ -38,7 +38,7 @@ def upload_dataset_hf(
         commit_message=commit_message or f"Upload {hf_path}",
     )
 
-def upload_bundle(
+def upload_model_bundle(
     bundle_dir: str | Path,
     *,
     repo_id: str,
