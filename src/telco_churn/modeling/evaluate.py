@@ -1,3 +1,5 @@
+"""Consistent evaluation for train pipeline."""
+
 from typing import Callable, Dict, Any
 from sklearn.pipeline import Pipeline
 

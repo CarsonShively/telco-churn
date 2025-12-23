@@ -1,3 +1,5 @@
+"""Write full local bundle ready to be uploaded to hf model repo."""
+
 from __future__ import annotations
 
 from pathlib import Path

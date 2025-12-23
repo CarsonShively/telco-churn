@@ -1,7 +1,7 @@
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 
-def tree_preprocessor() -> ColumnTransformer:
+def preprocessor() -> ColumnTransformer:
 
     features = [
         "tenure", "monthly_charges", "total_charges",

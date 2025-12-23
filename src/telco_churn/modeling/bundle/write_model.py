@@ -1,3 +1,5 @@
+"""Assemble model artifact into model.joblib."""
+
 from __future__ import annotations
 
 from pathlib import Path

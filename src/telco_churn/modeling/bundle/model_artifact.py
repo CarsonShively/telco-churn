@@ -1,3 +1,5 @@
+"""Wrapper for model write to include run id and model type."""
+
 from dataclasses import dataclass
 from typing import Any
 

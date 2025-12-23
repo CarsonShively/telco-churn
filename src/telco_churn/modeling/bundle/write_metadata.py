@@ -1,3 +1,5 @@
+"""Assemble and write meta data to metadata.json."""
+
 from __future__ import annotations
 
 import platform
