@@ -8,7 +8,7 @@ from sklearn.pipeline import Pipeline
 
 from telco_churn.modeling.feature_spec.feature_spec import FeatureSpecTransformer
 from telco_churn.modeling.feature_spec.load_spec import load_feature_spec
-from telco_churn.modeling.preprocessors.v2_tree import preprocessor  
+from telco_churn.modeling.preprocessors.tree import preprocessor  
 
 
 @dataclass(slots=True)
