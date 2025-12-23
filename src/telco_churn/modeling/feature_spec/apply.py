@@ -1,3 +1,5 @@
+"""Pure feature-spec application: add missing columns and enforce pandas dtypes."""
+
 from __future__ import annotations
 
 from typing import Any, Dict

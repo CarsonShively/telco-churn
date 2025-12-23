@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from telco_churn.io.bundle import atomic_write_json
+from telco_churn.io.atomic import atomic_write_json
 
 
 def assemble_metrics_payload(

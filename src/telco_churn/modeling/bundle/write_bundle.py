@@ -3,16 +3,16 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Dict
 
-from telco_churn.modeling.assemble_bundle.assemble_metrics import (
+from telco_churn.modeling.bundle.write_metrics import (
     assemble_metrics_payload,
     write_metrics_json,
 )
-from telco_churn.modeling.assemble_bundle.assemble_metadata import (
+from telco_churn.modeling.bundle.write_metadata import (
     assemble_metadata_payload,
     write_metadata_json,
 )
-from telco_churn.modeling.assemble_bundle.assemble_model import write_model_joblib
-from telco_churn.modeling.assemble_bundle.assemble_artifact import ModelArtifact
+from telco_churn.modeling.bundle.write_model import write_model_joblib
+from telco_churn.modeling.bundle.model_artifact import ModelArtifact
 
 
 def write_bundle(

@@ -17,7 +17,7 @@ def tree_preprocessor() -> ColumnTransformer:
 
     return ColumnTransformer(
         transformers=[
-            ("impute_missing_value", SimpleImputer(missing_values=-1, strategy="most_frequent"), features),
+            ("impute_missing_value", SimpleImputer(strategy="most_frequent"), features),
         ],
         remainder="drop",
     )

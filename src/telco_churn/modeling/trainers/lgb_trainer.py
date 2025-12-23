@@ -8,7 +8,7 @@ from sklearn.pipeline import Pipeline
 
 from telco_churn.modeling.feature_spec.feature_spec import FeatureSpecTransformer
 from telco_churn.modeling.feature_spec.load_spec import load_feature_spec
-from telco_churn.modeling.preprocessors. import lgb_preprocessor  
+from telco_churn.modeling.preprocessors.tree import preprocessor  
 
 
 @dataclass(slots=True)
@@ -22,7 +22,7 @@ class LGBTrainer:
         return Pipeline(
             steps=[
                 ("spec", FeatureSpecTransformer(self.spec, drop_columns=[id_col])),
-                ("pre", lgb_preprocessor()),
+                ("pre", preprocessor()),
                 ("clf", LGBMClassifier(
                     random_state=self.seed,
                     n_jobs=-1,

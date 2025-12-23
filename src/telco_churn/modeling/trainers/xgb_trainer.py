@@ -8,7 +8,7 @@ from xgboost import XGBClassifier
 
 from telco_churn.modeling.feature_spec.feature_spec import FeatureSpecTransformer
 from telco_churn.modeling.feature_spec.load_spec import load_feature_spec
-from telco_churn.modeling.preprocessors. import tree_preprocessor
+from telco_churn.modeling.preprocessors.tree import preprocessor
 
 
 @dataclass(slots=True)
@@ -22,7 +22,7 @@ class XGBTrainer:
         return Pipeline(
             steps=[
                 ("spec", FeatureSpecTransformer(self.spec, drop_columns=[id_col])),
-                ("pre", tree_preprocessor()),
+                ("pre", preprocessor()),
                 ("clf", XGBClassifier(
                     random_state=self.seed,
                     tree_method="hist",

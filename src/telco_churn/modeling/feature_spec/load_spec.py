@@ -1,3 +1,5 @@
+"""Load json spec."""
+
 import json
 from importlib.resources import files
 

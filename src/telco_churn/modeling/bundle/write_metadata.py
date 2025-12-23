@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from telco_churn.io.bundle import atomic_write_json
+from telco_churn.io.atomic import atomic_write_json
 
 
 def _safe_cfg_dict(cfg: Any) -> Dict[str, Any]:
@@ -17,7 +17,6 @@ def _safe_cfg_dict(cfg: Any) -> Dict[str, Any]:
     if isinstance(cfg, dict):
         return dict(cfg)
     return {"cfg_repr": repr(cfg)}
-
 
 def assemble_metadata_payload(
     *,
@@ -49,7 +48,6 @@ def assemble_metadata_payload(
         pass
 
     return meta
-
 
 def write_metadata_json(bundle_dir: Path, payload: Dict[str, Any]) -> Path:
     path = bundle_dir / "metadata.json"

@@ -1,3 +1,5 @@
+"""Explicitly cast train data parquet to a pandas dataframe."""
+
 from __future__ import annotations
 
 from typing import Iterable, Optional

@@ -3,7 +3,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
-def xgb_preprocessor() -> ColumnTransformer:
+def preprocessor() -> ColumnTransformer:
     ohe_cols = [
         "gender_id", "multiple_lines_id", "internet_service_id",
         "online_security_id", "online_backup_id", "device_protection_id",
@@ -26,7 +26,6 @@ def xgb_preprocessor() -> ColumnTransformer:
 
     ohe_pipeline = Pipeline(steps=[
         ("imputer", SimpleImputer(strategy="constant", fill_value=-1)),
-        ("ohe", OneHotEncoder(handle_unknown="ignore")),
     ])
 
     scaler_pipeline = Pipeline(steps=[
