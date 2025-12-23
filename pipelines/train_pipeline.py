@@ -2,6 +2,7 @@ import argparse
 import logging
 from pathlib import Path
 from time import perf_counter
+import warnings
 
 from sklearn.model_selection import StratifiedKFold, train_test_split
 from telco_churn.modeling.run_id import make_run_id
@@ -33,7 +34,7 @@ from telco_churn.modeling.config import (
 
 log = logging.getLogger(__name__)
 
-N_TRIALS = 250
+N_TRIALS = 100
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT_RUNS_DIR = REPO_ROOT / "artifacts" / "runs"
 
@@ -185,7 +186,12 @@ def main(*, modeltype: str, upload: bool = False) -> None:
 if __name__ == "__main__":
     args = parse_args()
     setup_logging(args.log_level)
-
+    warnings.filterwarnings(
+        """This project prioritises overall feature structure, other projects demonstrate feature explainability through the model."""
+        "ignore",
+        message=r"X does not have valid feature names, but LGBMClassifier was fitted with feature names",
+        category=UserWarning,
+    )
     try:
         main(modeltype=args.model_type, upload=args.upload)
     except Exception:
