@@ -1,56 +1,97 @@
-import os
-from dataclasses import dataclass
+"""Build gold.train.parquet from bronze offline data using DuckDB SQL, optionally uploading to HF."""
+
+from __future__ import annotations
+
+import argparse
+import logging
 from pathlib import Path
+from time import perf_counter
 
 import duckdb
 
-from telco_churn.io.hf import download_from_hf, upload_parquet
-from telco_churn.executor.executor_sql import SQLExecutor
-from telco_churn.data_layers.bronze.bronze import build_bronze_raw_from_parquet
+from telco_churn.io.hf import download_dataset_hf, upload_dataset_hf
+from telco_churn.db.executor import SQLExecutor
+from telco_churn.data_layers.bronze.ingest import build_bronze
+from telco_churn.logging_utils import setup_logging
+from telco_churn.config import (
+    REPO_ID,
+    BRONZE_OFFLINE_PARQUET,
+    GOLD_TRAIN_PARQUET,
+    DUCKDB_PATH,
+)
 
-BASE_SQL_PKG = "telco_churn.data_layers.silver"
+log = logging.getLogger(__name__)
+
+SILVER_SQL_PKG = "telco_churn.data_layers.silver"
+GOLD_SQL_PKG = "telco_churn.data_layers.gold"
+
 BASE_SQL_FILE = "base.sql"
-
-LABEL_SQL_PKG = "telco_churn.data_layers.silver"
 LABEL_SQL_FILE = "label.sql"
-
-FEATURES_SQL_PKG = "telco_churn.data_layers.gold"
 FEATURES_SQL_FILE = "features.sql"
-
-TRAIN_SQL_PKG = "telco_churn.data_layers.gold"
 TRAIN_SQL_FILE = "train.sql"
 
 
-@dataclass(frozen=True)
-class PipelineConfig:
-    repo_id: str = os.getenv("TELCO_REPO_ID", "Carson-Shively/telco-churn")
-    bronze_hf_path: str = os.getenv("TELCO_BRONZE_HF_PATH", "data/bronze/offline.parquet")
-    train_hf_path: str = os.getenv("TELCO_TRAIN_HF_PATH", "data/gold/train.parquet")
-    duckdb_path: str = os.getenv("TELCO_DUCKDB_PATH", ":memory:")
-    publish: bool = os.getenv("TELCO_PUBLISH", "0") == "1"
+def main(*, upload: bool) -> None:
+    """Run the training dataset build pipeline and optionally upload the output parquet to HF."""
+    t0 = perf_counter()
+    log.info("build_train start (upload=%s, duckdb_path=%s)", upload, DUCKDB_PATH)
 
-
-def main(cfg: PipelineConfig = PipelineConfig()) -> None:
     repo_root = Path(__file__).resolve().parents[1]
-    out_path = repo_root / "data" / "gold" / "train.parquet"
+    out_path = repo_root / GOLD_TRAIN_PARQUET
     out_path.parent.mkdir(parents=True, exist_ok=True)
+    log.info("Output parquet: %s", out_path)
 
-    with duckdb.connect(cfg.duckdb_path) as con:
-        ex = SQLExecutor(con)
+    try:
+        with duckdb.connect(DUCKDB_PATH) as con:
+            ex = SQLExecutor(con)
 
-        local_path = download_from_hf(repo_id=cfg.repo_id, filename=cfg.bronze_hf_path)
-        build_bronze_raw_from_parquet(con, local_path)
+            log.info("Downloading bronze: repo=%s file=%s", REPO_ID, BRONZE_OFFLINE_PARQUET)
+            local_bronze = download_dataset_hf(repo_id=REPO_ID, filename=BRONZE_OFFLINE_PARQUET)
+            log.info("Bronze local path: %s", local_bronze)
 
-        ex.execute_script(ex.load_sql(BASE_SQL_PKG, BASE_SQL_FILE))
-        ex.execute_script(ex.load_sql(LABEL_SQL_PKG, LABEL_SQL_FILE))
-        ex.execute_script(ex.load_sql(FEATURES_SQL_PKG, FEATURES_SQL_FILE))
-        ex.execute_script(ex.load_sql(TRAIN_SQL_PKG, TRAIN_SQL_FILE))
+            log.info("Building bronze")
+            build_bronze(con, local_bronze)
 
-        ex.write_parquet("SELECT * FROM gold.train", str(out_path))
+            log.info("Running SQL stage: base")
+            ex.execute_script(ex.load_sql(SILVER_SQL_PKG, BASE_SQL_FILE))
 
-    if cfg.publish:
-        upload_parquet(local_path=str(out_path), repo_id=cfg.repo_id, hf_path=cfg.train_hf_path)
+            log.info("Running SQL stage: label")
+            ex.execute_script(ex.load_sql(SILVER_SQL_PKG, LABEL_SQL_FILE))
 
+            log.info("Running SQL stage: features")
+            ex.execute_script(ex.load_sql(GOLD_SQL_PKG, FEATURES_SQL_FILE))
+
+            log.info("Running SQL stage: train")
+            ex.execute_script(ex.load_sql(GOLD_SQL_PKG, TRAIN_SQL_FILE))
+
+            nrows = con.execute("SELECT COUNT(*) FROM gold.train").fetchone()[0]
+            log.info("gold.train rows: %s", nrows)
+
+            if nrows == 0:
+                raise RuntimeError("gold.train is empty (0 rows)")
+
+            log.info("Writing parquet")
+            ex.write_parquet("SELECT * FROM gold.train", str(out_path))
+
+        if out_path.exists():
+            log.info("Wrote parquet size_bytes=%s", out_path.stat().st_size)
+
+        if upload:
+            log.info("Uploading to HF: repo=%s dest=%s", REPO_ID, GOLD_TRAIN_PARQUET)
+            upload_dataset_hf(local_path=str(out_path), repo_id=REPO_ID, hf_path=GOLD_TRAIN_PARQUET)
+            log.info("Upload complete")
+
+        log.info("build_train done in %.2fs", perf_counter() - t0)
+
+    except Exception:
+        log.exception("build_train failed")
+        raise
 
 if __name__ == "__main__":
-    main()
+    p = argparse.ArgumentParser()
+    p.add_argument("--log-level", default="INFO")
+    p.add_argument("--upload", action="store_true")
+    args = p.parse_args()
+
+    setup_logging(args.log_level)
+    main(upload=args.upload)
