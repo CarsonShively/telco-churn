@@ -1,3 +1,5 @@
+"""Write a DuckDB feature table to Redis and publish it atomically."""
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -6,18 +8,7 @@ from typing import Any
 import duckdb
 import redis
 
-from telco_churn.redis.config import RedisConfig, make_run_prefix, make_entity_key
-
-
-def atomic_write_text(path: Path, text: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(text, encoding="utf-8")
-    tmp.replace(path)
-
-def atomic_write_json(path: Path, obj: Any) -> None:
-    text = json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
-    atomic_write_text(path, text)
+from telco_churn.redis.infra import RedisConfig, make_run_prefix, make_entity_key
 
 
 def write_to_redis(
@@ -36,7 +27,6 @@ def write_to_redis(
     run_meta_key = f"{cfg.run_meta_prefix}{run_ts}"
 
     ttl_seconds = cfg.ttl_seconds
-
     index_key = f"{run_prefix}customers:index"
 
     r.hset(
@@ -53,6 +43,7 @@ def write_to_redis(
     )
 
     written = 0
+
     try:
         cur = con.execute(f"SELECT * FROM {table}")
         cols = [d[0] for d in cur.description]
@@ -88,32 +79,29 @@ def write_to_redis(
 
                 if mapping:
                     pipe.hset(key, mapping=mapping)
-
                     pipe.sadd(index_key, entity_id)
-
-                    if ttl_seconds is not None and ttl_seconds > 0:
+                    if ttl_seconds is not None:
                         pipe.expire(key, ttl_seconds)
                     written += 1
 
             pipe.execute()
 
-        if ttl_seconds is not None and ttl_seconds > 0:
+        if ttl_seconds is not None:
             r.expire(index_key, ttl_seconds)
 
         r.set(cfg.current_pointer_key, run_prefix)
 
-        published_at = datetime.now(timezone.utc).isoformat()
         r.hset(
             run_meta_key,
             mapping={
                 "status": "PUBLISHED",
                 "entities_written": str(written),
-                "published_at": published_at,
+                "published_at": datetime.now(timezone.utc).isoformat(),
                 "current_pointer_key": cfg.current_pointer_key,
             },
         )
 
-        if ttl_seconds is not None and ttl_seconds > 0:
+        if ttl_seconds is not None:
             r.expire(run_meta_key, ttl_seconds)
 
         return written, run_prefix
@@ -128,6 +116,6 @@ def write_to_redis(
                 "entities_written": str(written),
             },
         )
-        if ttl_seconds is not None and ttl_seconds > 0:
+        if ttl_seconds is not None:
             r.expire(run_meta_key, ttl_seconds)
         raise

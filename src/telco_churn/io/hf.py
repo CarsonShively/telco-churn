@@ -4,7 +4,8 @@ from huggingface_hub import hf_hub_download, HfApi, snapshot_download
 from typing import Optional, Any, Dict, List
 import json
 
-def download_from_hf(repo_id: str, filename: str, revision: str = "main") -> str:
+def download_dataset_hf(repo_id: str, filename: str, revision: str = "main") -> str:
+    """Download a single file from a Hugging Face dataset repo using the normal HF cache."""
     return hf_hub_download(
         repo_id=repo_id,
         filename=filename,
@@ -12,15 +13,20 @@ def download_from_hf(repo_id: str, filename: str, revision: str = "main") -> str
         revision=revision,
     )
 
-def upload_parquet(
+def upload_dataset_hf(
+    *,
     local_path: str | Path,
     repo_id: str,
     hf_path: str,
+    revision: str = "main",
     commit_message: str | None = None,
 ) -> None:
+    """Upload one local file to a Hugging Face dataset repo at hf_path."""
     p = Path(local_path)
     if not p.exists():
-        raise FileNotFoundError(f"Local file not found: {p}")
+        raise FileNotFoundError(f"Local path not found: {p}")
+    if not p.is_file():
+        raise IsADirectoryError(f"Expected a file, got: {p}")
 
     api = HfApi()
     api.upload_file(
@@ -28,6 +34,7 @@ def upload_parquet(
         path_in_repo=hf_path,
         repo_id=repo_id,
         repo_type="dataset",
+        revision=revision,
         commit_message=commit_message or f"Upload {hf_path}",
     )
 
@@ -140,3 +147,12 @@ def fetch_champion_pointer(
 
     return json.loads(Path(p).read_text(encoding="utf-8"))
 
+def atomic_write_text(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    tmp.replace(path)
+
+def atomic_write_json(path: Path, obj: Any) -> None:
+    text = json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+    atomic_write_text(path, text)

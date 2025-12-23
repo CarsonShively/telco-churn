@@ -6,7 +6,7 @@ from typing import Any, Dict
 import pandas as pd
 import redis
 
-from telco_churn.redis.config import RedisConfig, connect_redis
+from telco_churn.redis.infra import RedisConfig, connect_redis
 from telco_churn.redis.reader import RedisFeatureStore
 from telco_churn.io.load_model import (
     fetch_champion_pointer,

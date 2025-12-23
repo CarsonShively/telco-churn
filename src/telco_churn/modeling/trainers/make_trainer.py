@@ -1,3 +1,5 @@
+"""Trainer registry and factory for telco-churn modeling pipelines."""
+
 from __future__ import annotations
 
 from typing import Dict, Type

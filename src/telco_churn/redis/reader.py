@@ -5,7 +5,7 @@ from typing import Dict
 import random
 import redis
 
-from telco_churn.redis.config import RedisConfig, make_entity_key
+from telco_churn.redis.infra import RedisConfig, make_entity_key
 
 
 @dataclass(frozen=True)

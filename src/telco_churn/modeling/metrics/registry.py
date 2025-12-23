@@ -1,3 +1,5 @@
+"""Project metric functions for binary classification using estimator probabilities."""
+
 import numpy as np
 from sklearn.metrics import (
     average_precision_score, roc_auc_score, f1_score, precision_score, recall_score,
