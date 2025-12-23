@@ -43,7 +43,7 @@ from telco_churn.modeling.config import (
 
 log = logging.getLogger(__name__)
 
-N_TRIALS = 100
+N_TRIALS = 10
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT_RUNS_DIR = REPO_ROOT / "artifacts" / "runs"
 
