@@ -1,3 +1,5 @@
+"""Atomic file writers for small text/JSON artifacts (metrics, metadata, pointers)."""
+
 import json
 from pathlib import Path
 from typing import Any

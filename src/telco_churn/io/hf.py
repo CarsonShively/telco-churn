@@ -47,6 +47,7 @@ def upload_model_bundle(
     commit_message: Optional[str] = None,
     ensure_new: bool = True,
 ) -> str:
+    """Upload a local run bundle directory to a HF model repo under runs/{run_id}."""
     p = Path(bundle_dir)
 
     if not p.exists() or not p.is_dir():
