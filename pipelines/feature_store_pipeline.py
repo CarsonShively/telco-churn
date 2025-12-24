@@ -7,7 +7,7 @@ from telco_churn.io.hf import download_dataset_hf
 from telco_churn.db.executor import SQLExecutor
 from telco_churn.data_layers.bronze.ingest import build_bronze
 
-from telco_churn.redis.infra import RedisConfig, connect_redis
+from telco_churn.redis.connect import redis_config, connect_redis
 from telco_churn.redis.writer import write_to_redis
 
 from telco_churn.logging_utils import setup_logging
@@ -16,13 +16,6 @@ from telco_churn.config import (
     REPO_ID,
     BRONZE_ONLINE_PARQUET,
     DUCKDB_PATH,
-    REDIS_HOST,
-    REDIS_PORT,
-    REDIS_DB,
-    REDIS_BASE_PREFIX,
-    REDIS_CURRENT_POINTER_KEY,
-    REDIS_RUN_META_PREFIX,
-    REDIS_TTL_SECONDS,
     FEATURES_TABLE,
     ENTITY_COL,
 )
@@ -60,19 +53,8 @@ def main() -> None:
         log.info("Running SQL stage: features")
         ex.execute_script(ex.load_sql(GOLD_SQL_PKG, FEATURES_SQL_FILE))
 
-        ttl: int | None = None if REDIS_TTL_SECONDS <= 0 else REDIS_TTL_SECONDS
-
         log.info("Connecting to Redis")
-        redis_cfg = RedisConfig(
-            host=REDIS_HOST,
-            port=REDIS_PORT,
-            db=REDIS_DB,
-            base_prefix=REDIS_BASE_PREFIX,
-            current_pointer_key=REDIS_CURRENT_POINTER_KEY,
-            run_meta_prefix=REDIS_RUN_META_PREFIX,
-            ttl_seconds=ttl,
-        )
-
+        redis_cfg = redis_config()
         r = connect_redis(redis_cfg)
 
         log.info(
@@ -97,7 +79,6 @@ def main() -> None:
         )
 
     log.info("pipeline completed in %.2fs", perf_counter() - t0)
-
 
 if __name__ == "__main__":
     setup_logging("INFO")

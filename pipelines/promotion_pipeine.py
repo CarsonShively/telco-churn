@@ -4,7 +4,7 @@ champion's metrics, and (optionally) promotes the contender by updating
 
 from __future__ import annotations
 
-import argparse
+import argparse #move imports to designated place or keep here?
 import logging
 from pathlib import Path
 
@@ -15,7 +15,7 @@ from telco_churn.promotion.best_candidate import get_best_contender
 from telco_churn.promotion.decision import decide_promotion
 from telco_churn.promotion.registry import ChampionRef, write_champion_json
 from telco_churn.logging_utils import setup_logging
-
+# add to config?
 log = logging.getLogger(__name__)
 
 CHAMPION_PATH = "champion.json"
@@ -57,7 +57,7 @@ def main() -> None:
     champion_metrics = read_model_json(
         repo_id=REPO_ID,
         revision=REVISION,
-        path_in_repo=f'{champion_ptr["path_in_repo"]}/metrics.json',
+        path_in_repo=f'{champion_ptr["path_in_repo"]}/metrics.json', #make this a config?
     )
 
     contender_metrics = best_row.metrics
