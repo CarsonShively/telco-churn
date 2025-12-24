@@ -1,3 +1,5 @@
+"""Select the best run by ranking candidates on primary-metric CV mean (then lower CV std, then holdout score, then run_id)."""
+
 from __future__ import annotations
 
 from typing import Any, Optional

@@ -1,3 +1,5 @@
+"""Write a champion pointer (run_id and path_in_repo) to a local champion.json file."""
+
 import json
 from dataclasses import dataclass
 from pathlib import Path

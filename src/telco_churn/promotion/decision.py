@@ -1,3 +1,5 @@
+"""Decide whether to promote a contender by comparing its holdout primary metric to the current champion with an epsilon threshold."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -34,12 +36,6 @@ def decide_promotion(
     champion_metrics: Optional[Dict[str, Any]],
     epsilon: float = 1e-3,
 ) -> PromotionDecision:
-    """
-    Promotion rule:
-      - If no champion yet -> promote=True
-      - Else promote only if contender holdout primary > champion holdout primary + epsilon
-      - If tie or "close" (|diff| <= epsilon) -> promote=False (keep current)
-    """
     pm = _primary_metric_name(contender_metrics)
     c_val = _holdout_primary_value(contender_metrics, pm)
 
