@@ -42,7 +42,7 @@ from telco_churn.modeling.config import (
     SEED,
     CV_SPLITS
 )
-
+#save pipeline only not wrapped
 log = logging.getLogger(__name__)
 
 N_TRIALS = 10
