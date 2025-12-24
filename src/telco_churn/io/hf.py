@@ -1,8 +1,9 @@
 from __future__ import annotations
 from pathlib import Path
-from huggingface_hub import hf_hub_download, HfApi, snapshot_download
-from typing import Optional, Any, Dict, List
+from huggingface_hub import hf_hub_download, HfApi
+from typing import Optional, Any
 import json
+from huggingface_hub.utils import EntryNotFoundError
 
 def download_dataset_hf(repo_id: str, filename: str, revision: str = "main") -> str:
     """Download a single file from a Hugging Face dataset repo using the normal HF cache."""
@@ -84,76 +85,46 @@ def upload_model_bundle(
 
     return path_in_repo
 
-
-
-def fetch_all_candidate_metrics(
+def read_model_json(
     *,
     repo_id: str,
-    repo_type: str = "model",
-    revision: str = "main",
-    cache_dir: str = "hf_cache",
-) -> List[Dict[str, Any]]:
-
-    root = Path(
-        snapshot_download(
-            repo_id=repo_id,
-            repo_type=repo_type,
-            revision=revision,
-            cache_dir=cache_dir,
-            allow_patterns=["candidates/**/metrics.json"],
-        )
-    )
-
-    rows: List[Dict[str, Any]] = []
-    for metrics_path in root.rglob("candidates/**/metrics.json"):
-        if "candidates" not in metrics_path.parts:
-            continue
-
-        parts = metrics_path.parts
-        i = parts.index("candidates")
-        model_type: Optional[str] = parts[i + 1] if len(parts) > i + 1 else None
-        run_id: Optional[str] = parts[i + 2] if len(parts) > i + 2 else None
-
-        metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
-
-        rows.append(
-            {
-                "model_type": metrics.get("model_type", model_type),
-                "run_id": metrics.get("run_id", run_id),
-                "metrics_path": str(metrics_path),
-                "metrics": metrics,
-            }
-        )
-
-    return rows
-
-def fetch_champion_pointer(
-    *,
-    repo_id: str,
-    repo_type: str = "model",
-    revision: str = "main",
-    filename: str = "champion.json",
-    cache_dir: str = "hf_cache",
-) -> Optional[Dict[str, Any]]:
+    revision: str,
+    path_in_repo: str,
+) -> Optional[dict[str, Any]]:
     try:
-        p = hf_hub_download(
+        local_file = hf_hub_download(
             repo_id=repo_id,
-            repo_type=repo_type,
+            repo_type="model",
             revision=revision,
-            filename=filename,
-            cache_dir=cache_dir,
+            filename=path_in_repo,
         )
-    except Exception:
+    except EntryNotFoundError:
         return None
 
-    return json.loads(Path(p).read_text(encoding="utf-8"))
+    with open(local_file, "r", encoding="utf-8") as f:
+        return json.load(f)
+    
+def upload_model_json_hf( # combine with bundle upload? improve io hf names
+    local_path: str | Path,
+    *,
+    repo_id: str,
+    path_in_repo: str | None = None,
+    revision: str = "main",
+    commit_message: str | None = None,
+) -> None:
+    p = Path(local_path)
+    if not p.exists() or not p.is_file():
+        raise FileNotFoundError(f"Local file not found: {p}")
 
-def atomic_write_text(path: Path, text: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(text, encoding="utf-8")
-    tmp.replace(path)
+    dest = path_in_repo or p.name
+    msg = commit_message or f"Upload {dest}"
 
-def atomic_write_json(path: Path, obj: Any) -> None:
-    text = json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
-    atomic_write_text(path, text)
+    api = HfApi()
+    api.upload_file(
+        path_or_fileobj=str(p),
+        path_in_repo=dest,
+        repo_id=repo_id,
+        repo_type="model",
+        revision=revision,
+        commit_message=msg,
+    )
