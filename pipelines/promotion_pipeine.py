@@ -1,15 +1,26 @@
-from __future__ import annotations
-import argparse
-from pathlib import Path
-from telco_churn.io.hf_run_metrics import fetch_all_run_metrics
-from telco_churn.promotion.best_candidate import get_best_contender 
-from telco_churn.io.hf import read_model_json, upload_model_json_hf
-from telco_churn.promotion.registry import ChampionRef, write_champion_json
-from telco_churn.promotion.decision import decide_promotion
-from telco_churn.config import REPO_ID, REVISION
+"""Selects the best run from stored run metrics, compares it against the current
+champion's metrics, and (optionally) promotes the contender by updating
+`champion.json` in the model repo."""
 
+from __future__ import annotations
+
+import argparse
+import logging
+from pathlib import Path
+
+from telco_churn.config import REPO_ID, REVISION
+from telco_churn.io.hf import read_model_json, upload_model_json_hf
+from telco_churn.io.hf_run_metrics import fetch_all_run_metrics
+from telco_churn.promotion.best_candidate import get_best_contender
+from telco_churn.promotion.decision import decide_promotion
+from telco_churn.promotion.registry import ChampionRef, write_champion_json
+from telco_churn.logging_utils import setup_logging
+
+log = logging.getLogger(__name__)
+
+CHAMPION_PATH = "champion.json"
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CHAMPION_PATH = PROJECT_ROOT / "champion.json"
+CHAMPION_PATH_LOCAL = PROJECT_ROOT / CHAMPION_PATH
 EPSILON = 0.001
 
 def parse_args() -> argparse.Namespace:
@@ -25,50 +36,72 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    setup_logging()
+    log = logging.getLogger(__name__)
+    log.info("Starting promotion pipeline...")
 
-    rows = fetch_all_run_metrics(
-        repo_id=REPO_ID,
-        revision=REVISION,
-    )
-    
+    rows = fetch_all_run_metrics(repo_id=REPO_ID, revision=REVISION)
+
     try:
         best_row = get_best_contender(rows)
     except ValueError as e:
-        print(f"Promotion pipeline stopped: {e}")
+        log.error("Promotion pipeline stopped: %s", e)
         return
 
+    champion_ptr = read_model_json(
+        repo_id=REPO_ID,
+        revision=REVISION,
+        path_in_repo=CHAMPION_PATH,
+    )
+    
     champion_metrics = read_model_json(
         repo_id=REPO_ID,
         revision=REVISION,
-        path_in_repo=CHAMPION_PATH
+        path_in_repo=f'{champion_ptr["path_in_repo"]}/metrics.json',
     )
-    
+
     contender_metrics = best_row.metrics
-    
+
     decision = decide_promotion(
         contender_metrics=contender_metrics,
         champion_metrics=champion_metrics,
         epsilon=EPSILON,
     )
 
+    log.info(
+        "Promotion decision: promote=%s primary=%s contender=%.6f champion=%s reason=%s",
+        decision.promote,
+        decision.primary_metric,
+        decision.contender_primary,
+        f"{decision.champion_primary:.6f}" if decision.champion_primary is not None else "None",
+        decision.reason,
+    )
 
-    if decision.promote:
-        ref = ChampionRef(
-            run_id=best_row["run_id"],
-            path_in_repo=f"runs/{best_row['run_id']}",
+    if not decision.promote:
+        return
+
+    run_id = best_row.run_id
+    ref = ChampionRef(run_id=run_id, path_in_repo=f"runs/{run_id}")
+
+    local_path = write_champion_json(ref, out_path=CHAMPION_PATH_LOCAL)
+    log.info("Wrote local champion pointer: %s", local_path)
+
+    if args.promote:
+        upload_model_json_hf(
+            local_path,
+            repo_id=REPO_ID,
+            path_in_repo=CHAMPION_PATH,
+            revision=REVISION,
+            commit_message=f"Update champion pointer -> {run_id}",
         )
-
-        local_path = write_champion_json(ref, out_path=CHAMPION_PATH)
-        if args.promote:
-            upload_model_json_hf(
-                local_path,
-                repo_id=REPO_ID,
-                path_in_repo=CHAMPION_PATH,
-                revision=REVISION,
-                commit_message=f"Update champion pointer -> {best_row.run_id}",
-            )
+        log.info("Uploaded champion.json to model repo: %s (rev=%s)", REPO_ID, REVISION)
     else:
-        print("Champion wins:", decision.reason)
+        log.info("Dry-run (no upload). Pass --promote to apply.")
+    return        
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        log.exception("Promotion pipeline failed")
+        raise 
