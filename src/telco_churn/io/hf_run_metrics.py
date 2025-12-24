@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Optional
 
-from huggingface_hub import HfApi, hf_hub_download
+from huggingface_hub import HfApi
+from huggingface_hub.utils import EntryNotFoundError
+
+from telco_churn.io.hf import read_model_json
 
 
 @dataclass(frozen=True)
@@ -24,10 +25,6 @@ def extract_run_id_from_path(path_in_repo: str) -> Optional[str]:
     return None
 
 
-def _read_json(path: str) -> dict[str, Any]:
-    return json.loads(Path(path).read_text(encoding="utf-8"))
-
-
 def fetch_all_run_metrics(*, repo_id: str, revision: str = "main") -> list[RunRow]:
     api = HfApi()
     files = api.list_repo_files(repo_id=repo_id, repo_type="model", revision=revision)
@@ -41,13 +38,14 @@ def fetch_all_run_metrics(*, repo_id: str, revision: str = "main") -> list[RunRo
             continue
 
         try:
-            local_metrics = hf_hub_download(
+            metrics = read_model_json(
                 repo_id=repo_id,
-                repo_type="model",
                 revision=revision,
-                filename=mp,
+                path_in_repo=mp,
             )
-            metrics = _read_json(local_metrics)
+            if metrics is None:
+                raise EntryNotFoundError("File missing after listing", response=None)
+
             model_type = metrics.get("model_type")
 
             rows.append(
