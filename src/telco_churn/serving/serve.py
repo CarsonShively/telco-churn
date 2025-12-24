@@ -21,6 +21,7 @@ class ServingService:
     model: Any
     fs: RedisFeatureStore
     threshold: float = 0.65 #figure out threshold
+    model_run_id: str | None = None
 
     @classmethod
     def start(cls) -> "ServingService":
@@ -39,7 +40,7 @@ class ServingService:
         r = connect_redis(cfg)
         fs = RedisFeatureStore(r=r, cfg=cfg)
 
-        return cls(model=model, fs=fs)
+        return cls(model=model, fs=fs, model_run_id=champion_ptr.get("run_id"),)
 
     def predict_customer(self, customer_id: str) -> Dict[str, Any]:
         feats = self.fs.fetch_entity_features(customer_id)
