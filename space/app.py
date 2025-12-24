@@ -20,7 +20,7 @@ def init_service():
 
         status = {
             "ready": True,
-            "model_run_id": getattr(getattr(_svc, "artifact", None), "run_id", None),
+            "model_run_id": getattr(_svc, "model_run_id", None),
             "current_prefix": prefix,
             "sample_id_count": len(ids),
             "error": None,
@@ -100,3 +100,5 @@ demo.launch(server_name="0.0.0.0", server_port=int(os.getenv("PORT", "7860")))
 
 #uses logging and values sent on, NOT UI, what should be here?
 # adds to config from this file?
+
+# branch and improve commit practice
