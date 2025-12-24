@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Optional
 import math
+from telco_churn.config import CURRENT_ARTIFACT_VERSION
 
 
 def _f(x: Any) -> Optional[float]:
@@ -14,6 +15,14 @@ def _f(x: Any) -> Optional[float]:
         return v if math.isfinite(v) else None
     return None
 
+def _i(x: Any) -> Optional[int]:
+    if isinstance(x, bool):
+        return None
+    if isinstance(x, int):
+        return x
+    if isinstance(x, float) and x.is_integer():
+        return int(x)
+    return None
 
 def primary_metric_name(m: dict[str, Any]) -> str:
     pm = m.get("primary_metric")
@@ -21,6 +30,8 @@ def primary_metric_name(m: dict[str, Any]) -> str:
         raise ValueError("metrics.json missing required field: 'primary_metric'")
     return pm
 
+def artifact_version(m: dict[str, Any]) -> Optional[int]:
+    return _i(m.get("artifact_version"))
 
 def get_best_contender(rows: list[Any]) -> Any:
     best: Any = None
@@ -31,6 +42,11 @@ def get_best_contender(rows: list[Any]) -> Any:
             continue
 
         m = getattr(r, "metrics", None) or {}
+        
+        ver = artifact_version(m)
+        if ver != CURRENT_ARTIFACT_VERSION:
+            continue
+        
         try:
             pm = primary_metric_name(m)
         except ValueError:

@@ -29,6 +29,18 @@ def _holdout_primary_value(m: Dict[str, Any], pm: str) -> float:
         raise ValueError(f"metrics missing holdout primary value for '{pm}'")
     return float(v)
 
+def _artifact_version(m: Optional[Dict[str, Any]]) -> Optional[int]:
+    """Return artifact_version if present and parseable; else None."""
+    if not m:
+        return None
+    v = m.get("artifact_version")
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, int):
+        return v
+    if isinstance(v, float) and v.is_integer():
+        return int(v)
+    return None
 
 def decide_promotion(
     *,
@@ -49,6 +61,18 @@ def decide_promotion(
             diff=None,
         )
 
+    cont_ver = _artifact_version(contender_metrics)
+    champ_ver = _artifact_version(champion_metrics)  # missing => None
+    if cont_ver != champ_ver:
+        return PromotionDecision(
+            promote=True,
+            reason=f"Artifact version change: champion={champ_ver} contender={cont_ver}",
+            primary_metric=pm,
+            contender_primary=c_val,
+            champion_primary=None,  # optional: you can still include below, but not necessary
+            diff=None,
+        )
+    
     champ_pm = _primary_metric_name(champion_metrics)
     if champ_pm != pm:
         raise ValueError(f"primary_metric mismatch: contender={pm!r} champion={champ_pm!r}")
