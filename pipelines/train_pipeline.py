@@ -30,7 +30,9 @@ from telco_churn.config import (
     REPO_ID,
     REVISION,
     TRAIN_HF_PATH,
+    CURRENT_ARTIFACT_VERSION
 )
+
 from telco_churn.modeling.config import (
     TARGET_COL,
     PRIMARY_METRIC,
@@ -38,8 +40,7 @@ from telco_churn.modeling.config import (
     DEFAULT_THRESHOLD,
     HOLDOUT_SIZE,
     SEED,
-    CV_SPLITS,
-    CURRENT_ARTIFACT_VERSION
+    CV_SPLITS
 )
 
 log = logging.getLogger(__name__)
