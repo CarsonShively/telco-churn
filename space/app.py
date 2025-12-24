@@ -12,7 +12,7 @@ _init_error: str | None = None
 def init_service():
     global _svc, _init_error
     try:
-        _svc = ServingService.from_env()
+        _svc = ServingService.start()
         _init_error = None
 
         prefix = _svc.fs.current_run_prefix()
@@ -97,3 +97,6 @@ with gr.Blocks() as demo:
     btn.click(fn=predict, inputs=[customer_id], outputs=[out])
 
 demo.launch(server_name="0.0.0.0", server_port=int(os.getenv("PORT", "7860")))
+
+#uses logging and values sent on, NOT UI, what should be here?
+# adds to config from this file?
