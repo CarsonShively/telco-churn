@@ -4,6 +4,7 @@ from huggingface_hub import hf_hub_download, HfApi
 from typing import Optional, Any
 import json
 from huggingface_hub.utils import EntryNotFoundError
+import joblib
 
 def download_dataset_hf(repo_id: str, filename: str, revision: str = "main") -> str:
     """Download a single file from a Hugging Face dataset repo using the normal HF cache."""
@@ -130,3 +131,13 @@ def upload_model_json_hf( # combine with bundle upload? improve io hf names
         revision=revision,
         commit_message=msg,
     )
+    
+def load_model_hf(*, repo_id: str, revision: str, path_in_repo: str) -> Any:
+    """Download a model artifact from HF and load it with joblib."""
+    local_file = hf_hub_download(
+        repo_id=repo_id,
+        repo_type="model",
+        revision=revision,
+        filename=path_in_repo,
+    )
+    return joblib.load(local_file)
