@@ -20,7 +20,7 @@ def primary_metric_name(m: dict[str, Any]) -> str:
     return pm
 
 
-def pick_best_contender(rows: list[Any]) -> Any:
+def get_best_contender(rows: list[Any]) -> Any:
     best: Any = None
     best_key: Optional[tuple] = None
 
