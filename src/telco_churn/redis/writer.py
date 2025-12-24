@@ -1,5 +1,5 @@
 """Write a DuckDB feature table to Redis and publish it atomically."""
-
+#branch and improve write to redis later
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -10,7 +10,7 @@ import redis
 
 from telco_churn.redis.infra import RedisConfig, make_run_prefix, make_entity_key
 
-
+# should I be setting defaults?
 def write_to_redis(
     con: duckdb.DuckDBPyConnection,
     r: redis.Redis,

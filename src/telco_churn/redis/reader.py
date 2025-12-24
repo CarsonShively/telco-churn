@@ -1,13 +1,14 @@
+"""RedisFeatureStore reader for fetching entity feature hashes and sampling entity IDs from the currently published run."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Dict
-import random
 import redis
 
 from telco_churn.redis.infra import RedisConfig, make_entity_key
 
-
+#imporve redis read
 @dataclass(frozen=True)
 class RedisFeatureStore:
     r: redis.Redis
