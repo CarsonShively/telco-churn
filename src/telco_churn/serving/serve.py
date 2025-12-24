@@ -1,62 +1,49 @@
+"""Serving utilities to load the current champion model, connect to the Redis feature store, and generate churn predictions."""
+#remove annotation imports?
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Dict
 
 import pandas as pd
-import redis
-
-from telco_churn.redis.infra import RedisConfig, connect_redis
+# add logging?
+from telco_churn.redis.connect import redis_config, connect_redis
 from telco_churn.redis.reader import RedisFeatureStore
-from telco_churn.io.load_model import (
-    fetch_champion_pointer,
-    load_model_from_champion_pointer,
-)
+from telco_churn.io.hf import read_model_json
+from telco_churn.io.hf import load_model_hf
+from telco_churn.config import REPO_ID, REVISION
 
+#champion path as config or variable?
 
-@dataclass(frozen=True)
-class ServingConfig:
-    repo_id: str = "Carson-Shively/telco-churn"
-    revision: str = "main"
-    repo_type: str = "model"
-
-
+#class == best way of doing this? start once -> predicts?
 @dataclass
 class ServingService:
     model: Any
     fs: RedisFeatureStore
-    serving_cfg: ServingConfig
+    threshold: float = 0.65 #figure out threshold
 
     @classmethod
-    def from_env(cls) -> "ServingService":
-        serving_cfg = ServingConfig()
-
-        champion = fetch_champion_pointer(
-            repo_id=serving_cfg.repo_id,
-            repo_type=serving_cfg.repo_type,
-            revision=serving_cfg.revision,
+    def start(cls) -> "ServingService":
+        champion_ptr = read_model_json(repo_id=REPO_ID, revision=REVISION, path_in_repo="champion.json")
+        if champion_ptr is None:
+            raise RuntimeError("No champion.json found")
+        #reused load model?
+        artifact = load_model_hf(
+            repo_id=REPO_ID,
+            revision=REVISION,
+            path_in_repo=f'{champion_ptr["path_in_repo"]}/model.joblib',
         )
-        if champion is None:
-            raise RuntimeError("No champion.json found yet")
-
-        artifact = load_model_from_champion_pointer(
-            champion,
-            repo_id=serving_cfg.repo_id,
-            repo_type=serving_cfg.repo_type,
-            revision=serving_cfg.revision,
-        )
-
         model = getattr(artifact, "model", artifact)
 
-        redis_cfg = RedisConfig.from_env()
-        r: redis.Redis[str] = connect_redis(redis_cfg)
-        fs = RedisFeatureStore(r=r, cfg=redis_cfg)
+        cfg = redis_config()
+        r = connect_redis(cfg)
+        fs = RedisFeatureStore(r=r, cfg=cfg)
 
-        return cls(model=model, fs=fs, serving_cfg=serving_cfg)
+        return cls(model=model, fs=fs)
 
     def predict_customer(self, customer_id: str) -> Dict[str, Any]:
-        run_prefix = self.fs.current_run_prefix()
         feats = self.fs.fetch_entity_features(customer_id)
+        run_prefix = self.fs.current_run_prefix()
 
         X = pd.DataFrame([feats])
 
@@ -64,24 +51,20 @@ class ServingService:
         if hasattr(self.model, "predict_proba"):
             churn_score = float(self.model.predict_proba(X)[0, 1])
 
-        threshold = 0.65
-        policy: dict[str, Any] = {"type": "fixed_threshold", "threshold": threshold}
-
-        decision_target: bool | None = None
-        decision_rule: str
-
+        decision_target: bool | None
         if churn_score is not None:
-            decision_target = churn_score >= threshold
-            decision_rule = f"churn_score >= {threshold}"
+            decision_target = churn_score >= self.threshold
         else:
             pred = self.model.predict(X)[0]
             decision_target = bool(pred) if isinstance(pred, (bool, int)) else None
-            decision_rule = "model.predict() (no predict_proba available)"
 
         return {
             "customer_id": customer_id,
             "feature_store_prefix": run_prefix,
             "churn_score": churn_score,
             "decision_target": decision_target,
-            "policy": policy,
-        }
+            "policy": {"type": "fixed_threshold", "threshold": self.threshold},
+        } 
+        #define output structure somewhere else? not a UI output, a api log (better word for it) sent on in backend
+        # is it worth the time to fix df feature names output and threshold?
+        # improve prprocessors and features, explain gold features? worth the time?
