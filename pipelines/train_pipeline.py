@@ -39,6 +39,7 @@ from telco_churn.modeling.config import (
     HOLDOUT_SIZE,
     SEED,
     CV_SPLITS,
+    CURRENT_ARTIFACT_VERSION
 )
 
 log = logging.getLogger(__name__)
@@ -145,6 +146,7 @@ def main(*, modeltype: str, upload: bool = False) -> None:
 
     artifact_obj = ModelArtifact(
         run_id=run_id,
+        artifact_version=CURRENT_ARTIFACT_VERSION,
         model_type=modeltype,
         model=artifact,
         threshold=DEFAULT_THRESHOLD,
@@ -170,6 +172,7 @@ def main(*, modeltype: str, upload: bool = False) -> None:
 
     write_bundle(
         bundle_dir=bundle_dir,
+        artifact_version=CURRENT_ARTIFACT_VERSION,
         artifact_obj=artifact_obj,
         best_params=best_params,
         cv_summary=cv_summary,
