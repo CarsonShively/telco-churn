@@ -62,14 +62,14 @@ def decide_promotion(
         )
 
     cont_ver = _artifact_version(contender_metrics)
-    champ_ver = _artifact_version(champion_metrics)  # missing => None
+    champ_ver = _artifact_version(champion_metrics)
     if cont_ver != champ_ver:
         return PromotionDecision(
             promote=True,
             reason=f"Artifact version change: champion={champ_ver} contender={cont_ver}",
             primary_metric=pm,
             contender_primary=c_val,
-            champion_primary=None,  # optional: you can still include below, but not necessary
+            champion_primary=None,
             diff=None,
         )
     
