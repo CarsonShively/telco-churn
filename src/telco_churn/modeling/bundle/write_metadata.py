@@ -23,12 +23,14 @@ def _safe_cfg_dict(cfg: Any) -> Dict[str, Any]:
 def assemble_metadata_payload(
     *,
     run_id: str,
+    artifact_version: int,
     model_type: str,
     best_params: Dict[str, Any],
     cfg: Any = None,
 ) -> Dict[str, Any]:
     meta: Dict[str, Any] = {
         "run_id": run_id,
+        "artifact_version": artifact_version,
         "model_type": model_type,
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "best_params": best_params,

@@ -11,6 +11,7 @@ from telco_churn.io.atomic import atomic_write_json
 def assemble_metrics_payload(
     *,
     run_id: str,
+    artifact_version: int,
     model_type: str,
     primary_metric: str,
     direction: str,
@@ -21,6 +22,7 @@ def assemble_metrics_payload(
     primary_value = holdout_metrics.get(primary_metric)
     payload: Dict[str, Any] = {
         "run_id": run_id,
+        "artifact_version": artifact_version,
         "model_type": model_type,
         "primary_metric": primary_metric,
         "direction": direction,

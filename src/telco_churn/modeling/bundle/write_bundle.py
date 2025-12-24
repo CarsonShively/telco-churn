@@ -20,6 +20,7 @@ from telco_churn.modeling.bundle.model_artifact import ModelArtifact
 def write_bundle(
     *,
     bundle_dir: Path,
+    artifact_version: int,
     artifact_obj: ModelArtifact,
     best_params: Dict[str, Any],
     cv_summary: Dict[str, Any],
@@ -32,6 +33,7 @@ def write_bundle(
 
     metrics_payload = assemble_metrics_payload(
         run_id=artifact_obj.run_id,
+        artifact_version=artifact_version,
         model_type=artifact_obj.model_type,
         primary_metric=primary_metric,
         direction=direction,
@@ -43,6 +45,7 @@ def write_bundle(
 
     meta_payload = assemble_metadata_payload(
         run_id=artifact_obj.run_id,
+        artifact_version=artifact_version,
         model_type=artifact_obj.model_type,
         best_params=best_params,
         cfg=cfg,
