@@ -91,6 +91,7 @@ def read_model_json(
     revision: str,
     path_in_repo: str,
 ) -> Optional[dict[str, Any]]:
+    """Download and parse a JSON file from a Hugging Face model repo (returns None if missing)."""
     try:
         local_file = hf_hub_download(
             repo_id=repo_id,
@@ -112,6 +113,7 @@ def upload_model_json_hf( # combine with bundle upload? improve io hf names
     revision: str = "main",
     commit_message: str | None = None,
 ) -> None:
+    """Upload a local JSON file to a Hugging Face model repo at the given repo path."""
     p = Path(local_path)
     if not p.exists() or not p.is_file():
         raise FileNotFoundError(f"Local file not found: {p}")
