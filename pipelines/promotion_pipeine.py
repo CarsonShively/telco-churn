@@ -3,11 +3,11 @@ champion's metrics, and (optionally) promotes the contender by updating
 `champion.json` in the model repo."""
 
 from __future__ import annotations
-#improve logging
-import argparse #move imports to designated place or keep here?
+
+import argparse
 import logging
 from pathlib import Path
-#no current version logic
+
 from telco_churn.config import REPO_ID, REVISION
 from telco_churn.io.hf import read_model_json, upload_model_json_hf
 from telco_churn.io.hf_run_metrics import fetch_all_run_metrics
@@ -15,9 +15,9 @@ from telco_churn.promotion.best_candidate import get_best_contender
 from telco_churn.promotion.decision import decide_promotion
 from telco_churn.promotion.registry import ChampionRef, write_champion_json
 from telco_churn.logging_utils import setup_logging
-# add to config?
+
 log = logging.getLogger(__name__)
-#add version explanation
+
 CHAMPION_PATH = "champion.json"
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CHAMPION_PATH_LOCAL = PROJECT_ROOT / CHAMPION_PATH
@@ -57,7 +57,7 @@ def main() -> None:
     champion_metrics = read_model_json(
         repo_id=REPO_ID,
         revision=REVISION,
-        path_in_repo=f'{champion_ptr["path_in_repo"]}/metrics.json', #make this a config?
+        path_in_repo=f'{champion_ptr["path_in_repo"]}/metrics.json',
     )
 
     contender_metrics = best_row.metrics

@@ -1,3 +1,5 @@
+"""Update entities stored in the redis feature store."""
+
 import logging
 from time import perf_counter
 
