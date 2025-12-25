@@ -33,10 +33,12 @@ The system is designed so that **models, features, and data artifacts are reprod
 
 ## Create and activate a virtual environment
 python3 -m venv .venv
+
 source .venv/bin/activate
 
 ## Install dependencies
 !pip install -U pip
+
 !pip install -e .
 
 ## Start the local demo app 
@@ -44,6 +46,7 @@ python3 space/app.py
 
 ## Data pipeline
 python3 pipelines/data_pipeline.py
+
 python3 pipelines/data_pipeline.py --upload
 
 ## Feature store pipeline
@@ -54,11 +57,14 @@ python3 pipelines/feature_store_pipeline.py
 - `lr`  — Logistic Regression
 - `xgb` — XGBoost
 - `lgb` — LightGBM
+
 python3 pipelines/train_pipeline.py --model-type xgb
+
 python3 pipelines/train_pipeline.py --model-type xgb --upload
 
 ## Promotion pipeline - Select the best contender and compare it against the current champion
 python3 pipelines/promotion_pipeline.py
+
 python3 pipelines/promotion_pipeline.py --promote
 
 
@@ -72,6 +78,7 @@ This project uses a Hugging Face **dataset repository** and **model repository**
 ## HF Authentication
 huggingface-cli login
 
+## Feature Store Reasoning
 customer Churn is often handled via batch inference.  
 Here, a feature store is used to demonstrate online ML architecture and
 production-oriented system design.
