@@ -1,3 +1,5 @@
+"""Gradio built demo app, displays the backend response payload"""
+
 from __future__ import annotations
 
 import os
