@@ -42,10 +42,10 @@ from telco_churn.modeling.config import (
     SEED,
     CV_SPLITS
 )
-#save pipeline only not wrapped
+
 log = logging.getLogger(__name__)
 
-N_TRIALS = 10
+N_TRIALS = 250
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT_RUNS_DIR = REPO_ROOT / "artifacts" / "runs"
 
@@ -200,8 +200,7 @@ def main(*, modeltype: str, upload: bool = False) -> None:
 if __name__ == "__main__":
     args = parse_args()
     setup_logging(args.log_level)
-    # Silence sklearn warning caused by LightGBM seeing DataFrame feature names during fit
-    # and NumPy arrays during CV/eval. Safe for this project because column order is stable.
+    # This project is not getting feature names out, going from df->array during model fit is completely fine.
     warnings.filterwarnings(
         "ignore",
         message=r"X does not have valid feature names, but LGBMClassifier was fitted with feature names",
