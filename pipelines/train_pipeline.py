@@ -196,7 +196,6 @@ def main(*, modeltype: str, upload: bool = False) -> None:
 
     log.info("train done run_id=%s in %.2fs", run_id, perf_counter() - t0)
 
-
 if __name__ == "__main__":
     args = parse_args()
     setup_logging(args.log_level)
