@@ -13,13 +13,15 @@ dependencies = [
   "duckdb==1.4.3",
   "huggingface-hub[cli]>=0.20",
   "redis==7.1.0",
-  "pandas==2.3.3",
+  "pandas>=2.2.2,<2.3",
+  "numpy>=2.0,<2.2",
   "scikit-learn==1.8.0",
   "optuna==4.6.0",
-  "numpy==2.3.5",
   "xgboost==3.1.2",
   "lightgbm==4.6.0",
+  "gradio==6.2.0",
 ]
+
 
 [tool.setuptools]
 package-dir = {"" = "src"}
