@@ -106,7 +106,7 @@ def read_model_json(
     with open(local_file, "r", encoding="utf-8") as f:
         return json.load(f)
     
-def upload_model_json_hf( # combine with bundle upload? improve io hf names
+def upload_model_json_hf(
     local_path: str | Path,
     *,
     repo_id: str,

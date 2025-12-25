@@ -1,3 +1,5 @@
+"""Model training constants."""
+
 TARGET_COL = "churn"
 
 PRIMARY_METRIC = "average_precision"

@@ -1,5 +1,5 @@
 """List and download per-run metrics.json files from the HF model repo and return them as RunRow records."""
-# store metrics differently?
+
 from __future__ import annotations
 
 from dataclasses import dataclass

@@ -1,4 +1,4 @@
-"""Load json spec."""
+"""Load json spec, feature spec JSON can be replaced with any features and types, nothing will break, pipeline will remain deterministic."""
 
 import json
 from importlib.resources import files

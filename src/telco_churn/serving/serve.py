@@ -1,26 +1,23 @@
 """Serving utilities to load the current champion model, connect to the Redis feature store, and generate churn predictions."""
-#remove annotation imports?
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Dict
 
 import pandas as pd
-# add logging?
+
 from telco_churn.redis.connect import redis_config, connect_redis
 from telco_churn.redis.reader import RedisFeatureStore
 from telco_churn.io.hf import read_model_json
 from telco_churn.io.hf import load_model_hf
 from telco_churn.config import REPO_ID, REVISION
 
-#champion path as config or variable?
-
-#class == best way of doing this? start once -> predicts?
 @dataclass
 class ServingService:
     model: Any
     fs: RedisFeatureStore
-    threshold: float = 0.65 #figure out threshold
+    threshold: float = 0.65
     model_run_id: str | None = None
 
     @classmethod
@@ -28,7 +25,6 @@ class ServingService:
         champion_ptr = read_model_json(repo_id=REPO_ID, revision=REVISION, path_in_repo="champion.json")
         if champion_ptr is None:
             raise RuntimeError("No champion.json found")
-        #reused load model?
         artifact = load_model_hf(
             repo_id=REPO_ID,
             revision=REVISION,
@@ -66,6 +62,3 @@ class ServingService:
             "decision_target": decision_target,
             "policy": {"type": "fixed_threshold", "threshold": self.threshold},
         } 
-        #define output structure somewhere else? not a UI output, a api log (better word for it) sent on in backend
-        # is it worth the time to fix df feature names output and threshold?
-        # improve prprocessors and features, explain gold features? worth the time?
