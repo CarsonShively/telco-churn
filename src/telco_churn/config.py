@@ -3,8 +3,8 @@
 REPO_ID = "Carson-Shively/telco-churn"
 REVISION = "main"
 
-BRONZE_OFFLINE_PARQUET = "data/bronze/offline.parquet"
-BRONZE_ONLINE_PARQUET = "data/bronze/online.parquet"
+BRONZE_OFFLINE_PARQUET = "data/bronze/train.parquet"
+BRONZE_ONLINE_PARQUET = "data/bronze/demo.parquet"
 
 GOLD_TRAIN_PARQUET = "data/gold/train.parquet"
 

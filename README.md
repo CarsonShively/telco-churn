@@ -37,9 +37,9 @@ python3 -m venv .venv
 source .venv/bin/activate
 
 ## Install dependencies
-!pip install -U pip
+pip install -U pip
 
-!pip install -e .
+pip install -e .
 
 ## Start the local demo app 
 python3 space/app.py
