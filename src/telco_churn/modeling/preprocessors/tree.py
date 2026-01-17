@@ -26,6 +26,7 @@ def preprocessor() -> ColumnTransformer:
 
     ohe_pipeline = Pipeline(steps=[
         ("imputer", SimpleImputer(strategy="constant", fill_value=-1)),
+        ("ohe", OneHotEncoder(handle_unknown="ignore", sparse_output=True))
     ])
 
     scaler_pipeline = Pipeline(steps=[

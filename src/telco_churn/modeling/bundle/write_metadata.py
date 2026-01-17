@@ -27,6 +27,7 @@ def assemble_metadata_payload(
     model_type: str,
     best_params: Dict[str, Any],
     cfg: Any = None,
+    feature_names: list[str] | None = None,
 ) -> Dict[str, Any]:
     meta: Dict[str, Any] = {
         "run_id": run_id,
@@ -35,6 +36,7 @@ def assemble_metadata_payload(
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "best_params": best_params,
         "cfg": _safe_cfg_dict(cfg),
+        "feature_names": feature_names,
         "python": platform.python_version(),
         "platform": platform.platform(),
     }

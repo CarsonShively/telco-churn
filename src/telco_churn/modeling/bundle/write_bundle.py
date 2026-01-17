@@ -28,6 +28,7 @@ def write_bundle(
     primary_metric: str,
     direction: str,
     cfg: Any = None,
+    feature_names: list[str] | None = None,
 ) -> Path:
     write_model_joblib(bundle_dir, artifact_obj)
 
@@ -49,6 +50,7 @@ def write_bundle(
         model_type=artifact_obj.model_type,
         best_params=best_params,
         cfg=cfg,
+        feature_names=feature_names,
     )
     write_metadata_json(bundle_dir, meta_payload)
 
