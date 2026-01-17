@@ -25,19 +25,20 @@ from telco_churn.modeling.evaluate import evaluate
 from telco_churn.modeling.trainers.make_trainer import make_trainer, available_trainers
 from telco_churn.modeling.bundle.model_artifact import ModelArtifact
 from telco_churn.logging_utils import setup_logging
+from telco_churn.modeling.threshold import tune_threshold
 
 from telco_churn.config import (
     REPO_ID,
     REVISION,
     TRAIN_HF_PATH,
-    CURRENT_ARTIFACT_VERSION
+    CURRENT_ARTIFACT_VERSION,
+    FLAG_RATE
 )
 
 from telco_churn.modeling.config import (
     TARGET_COL,
     PRIMARY_METRIC,
     METRIC_DIRECTION,
-    DEFAULT_THRESHOLD,
     HOLDOUT_SIZE,
     SEED,
     CV_SPLITS
@@ -45,7 +46,7 @@ from telco_churn.modeling.config import (
 
 log = logging.getLogger(__name__)
 
-N_TRIALS = 250
+N_TRIALS = 50
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT_RUNS_DIR = REPO_ROOT / "artifacts" / "runs"
 
@@ -126,20 +127,24 @@ def main(*, modeltype: str, upload: bool = False) -> None:
     log.info("optuna tuning done best_params_keys=%s", sorted(best_params.keys()))
 
     log.info("fit best model")
-    artifact = fit_best(
+    artifact, feature_names = fit_best(
         build_pipeline=trainer.build_pipeline,
         X=X_train,
         y=y_train,
         best_params=best_params,
     )
+    
+    holdout_scores = artifact.predict_proba(X_holdout)[:, 1]
+    threshold = tune_threshold(holdout_scores, flag_rate=FLAG_RATE)
+    log.info("threshold tuned method=quantile flag_rate=%.3f threshold=%.6f", FLAG_RATE, threshold)
 
-    log.info("evaluate holdout threshold=%.3f", DEFAULT_THRESHOLD)
+    log.info("evaluate holdout threshold=%.3f", threshold)
     holdout_metrics = evaluate(
         artifact,
         X_holdout,
         y_holdout,
         metrics=metrics,
-        threshold=DEFAULT_THRESHOLD,
+        threshold=threshold,
     )
     log.info("holdout metrics keys=%s", sorted(holdout_metrics.keys()))
     if PRIMARY_METRIC in holdout_metrics:
@@ -150,7 +155,7 @@ def main(*, modeltype: str, upload: bool = False) -> None:
         artifact_version=CURRENT_ARTIFACT_VERSION,
         model_type=modeltype,
         model=artifact,
-        threshold=DEFAULT_THRESHOLD,
+        threshold=threshold,
     )
 
     bundle_dir = ARTIFACT_RUNS_DIR / run_id
@@ -164,7 +169,7 @@ def main(*, modeltype: str, upload: bool = False) -> None:
         "target_col": TARGET_COL,
         "primary_metric": PRIMARY_METRIC,
         "direction": METRIC_DIRECTION,
-        "threshold": DEFAULT_THRESHOLD,
+        "threshold": threshold,
         "seed": SEED,
         "holdout_size": HOLDOUT_SIZE,
         "cv_splits": CV_SPLITS,
@@ -181,6 +186,7 @@ def main(*, modeltype: str, upload: bool = False) -> None:
         primary_metric=PRIMARY_METRIC,
         direction=METRIC_DIRECTION,
         cfg=cfg,
+        feature_names=feature_names,
     )
 
     required = ["model.joblib", "metrics.json", "metadata.json"]

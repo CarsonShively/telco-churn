@@ -6,6 +6,10 @@ data/**
 artifacts/**
 !artifacts/.gitkeep
 
+# ---- reports artifacts (generated) ----
+reports/**
+!reports/.gitkeep
+
 # ---- virtual environments ----
 _venv/
 .venv/
