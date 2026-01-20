@@ -2,14 +2,14 @@
 
 CREATE SCHEMA IF NOT EXISTS silver;
 
-CREATE OR REPLACE TABLE silver.base AS
+CREATE OR REPLACE TABLE {base_table} AS
 WITH raw AS (
   SELECT
     customerID, gender, Partner, Dependents, PhoneService, MultipleLines,
     InternetService, OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport,
     StreamingTV, StreamingMovies, Contract, PaperlessBilling, PaymentMethod,
     SeniorCitizen, tenure, MonthlyCharges, TotalCharges
-  FROM bronze.raw
+  FROM {bronze_table}
 ),
 typed AS (
   SELECT

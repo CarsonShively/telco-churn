@@ -2,10 +2,10 @@
 
 CREATE SCHEMA IF NOT EXISTS gold;
 
-CREATE OR REPLACE TABLE gold.train AS
+CREATE OR REPLACE TABLE gold.join_train AS
 SELECT
   f.*,
   l.churn
-FROM gold.features f
+FROM gold.train_features f
 JOIN silver.labels l
   ON l.customer_id = f.customer_id;

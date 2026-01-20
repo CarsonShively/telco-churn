@@ -1,15 +1,17 @@
 import duckdb
+from pathlib import Path
 
-def build_bronze(
-    con: duckdb.DuckDBPyConnection,
-    parquet_path: str,
-    *,
-    table_name: str = "bronze.raw",
-) -> str:
-    """Create/replace a DuckDB bronze table from a parquet file and return the table name."""
+def build_bronze(con: duckdb.DuckDBPyConnection, parquet_path: str, bronze_table: str) -> str:
+    if not Path(parquet_path).exists():
+        raise FileNotFoundError(f"Parquet not found: {parquet_path}")
+
     con.execute("CREATE SCHEMA IF NOT EXISTS bronze;")
     con.execute(
-        f"CREATE OR REPLACE TABLE {table_name} AS SELECT * FROM read_parquet(?)",
+        "CREATE OR REPLACE TABLE {bronze_table} AS SELECT * FROM read_parquet(?)".format(
+            bronze_table=bronze_table
+        ),
         [parquet_path],
     )
-    return table_name
+
+
+    return bronze_table
