@@ -1,20 +1,8 @@
 """Decide whether to promote a contender by comparing its holdout primary metric to the current champion with an epsilon threshold."""
 
 from __future__ import annotations
-
-from dataclasses import dataclass
 from typing import Any, Dict, Optional
-
-
-@dataclass(frozen=True)
-class PromotionDecision:
-    promote: bool
-    reason: str
-    primary_metric: str
-    contender_primary: float
-    champion_primary: Optional[float] = None
-    diff: Optional[float] = None
-
+from telco_churn.promotion.type import PromotionDecision
 
 def _primary_metric_name(m: Dict[str, Any]) -> str:
     pm = m.get("primary_metric")

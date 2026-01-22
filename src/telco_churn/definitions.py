@@ -28,7 +28,13 @@ from telco_churn.assets.threshold import threshold
 from telco_churn.assets.tts_cv import tts_cv
 from telco_churn.assets.upload_bundle import upload_bundle
 
-from telco_churn.jobs import data_job, batch_job, train_job
+from telco_churn.assets.promote import promote
+from telco_churn.assets.promotion_decision import promotion_decision
+from telco_churn.assets.champion import champion
+from telco_churn.assets.run_metrics import run_metrics
+from telco_churn.assets.best_contender import best_contender
+
+from telco_churn.jobs import data, batch, train, promotion
 from telco_churn.resources.data import HFDataResource
 from telco_churn.resources.model import HFModelResource
 from telco_churn.resources.batch import BatchContextResource
@@ -61,10 +67,15 @@ defs = dg.Definitions(
         fit_artifact,
         holdout,
         bundle,
-        upload_bundle       
+        upload_bundle,
+        promote,
+        promotion_decision,
+        champion,
+        run_metrics,
+        best_contender       
         
     ],
-    jobs=[data_job, batch_job, train_job],
+    jobs=[data, batch, train, promotion],
     resources={
         "hf_data": HFDataResource(repo_id=REPO_ID, revision=REVISION),
         "hf_model": HFModelResource(repo_id=REPO_ID, revision=REVISION),

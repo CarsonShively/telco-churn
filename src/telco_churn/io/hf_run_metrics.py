@@ -2,22 +2,13 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Optional
 
 from huggingface_hub import HfApi
 from huggingface_hub.utils import EntryNotFoundError
 
 from telco_churn.io.hf import read_model_json
-
-
-@dataclass(frozen=True)
-class RunRow:
-    run_id: str
-    model_type: Optional[str]
-    metrics: dict[str, Any]
-    metrics_path: str
-    error: Optional[str] = None
+from telco_churn.promotion.type import RunRow
 
 
 def extract_run_id_from_path(path_in_repo: str) -> Optional[str]:

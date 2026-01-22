@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Optional
 import math
 from telco_churn.config import CURRENT_ARTIFACT_VERSION
+from telco_churn.promotion.type import RunRow
 
 
 def _f(x: Any) -> Optional[float]:
@@ -33,7 +34,7 @@ def primary_metric_name(m: dict[str, Any]) -> str:
 def artifact_version(m: dict[str, Any]) -> Optional[int]:
     return _i(m.get("artifact_version"))
 
-def get_best_contender(rows: list[Any]) -> Any:
+def get_best_contender(rows: list[RunRow]) -> RunRow:
     best: Any = None
     best_key: Optional[tuple] = None
 
