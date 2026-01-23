@@ -28,7 +28,7 @@ def artifact_bundle(
         threshold=best_threshold,
     )
 
-    bundle_dir = REPO_ROOT / "runs" / run_id
+    bundle_dir = REPO_ROOT / "artifacts" / "runs" / run_id
     bundle_dir.mkdir(parents=True, exist_ok=True)
 
     cfg = {

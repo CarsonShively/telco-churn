@@ -5,4 +5,6 @@ class DuckDBResource(dg.ConfigurableResource):
     path: str
 
     def db_path(self) -> Path:
-        return Path(self.path).expanduser().resolve()
+        p = Path(self.path).expanduser()
+        p.parent.mkdir(parents=True, exist_ok=True)
+        return p.resolve()

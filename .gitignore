@@ -1,36 +1,15 @@
-# ---- data artifacts (generated) ----
-data/**
-!data/.gitkeep
+data/
 
-# ---- model artifacts (generated) ----
-artifacts/**
-!artifacts/.gitkeep
+artifacts/
 
-# ---- reports artifacts (generated) ----
-reports/**
-!reports/.gitkeep
+reports/
 
-# ---- virtual environments ----
-_venv/
 .venv/
-venv/
-env/
 
-# ---- python cache/build ----
-__pycache__/
-*.py[cod]
 *.egg-info/
-build/
-dist/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
 
-# ---- notebooks (optional) ----
-.ipynb_checkpoints/
-
-# ---- OS/editor ----
-.DS_Store
-.vscode/
+__pycache__/
 
 champion.json
+
+.dagster_home/

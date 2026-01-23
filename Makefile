@@ -1,4 +1,4 @@
-.PHONY: venv install dagster
+.PHONY: venv install dagster dagster-home
 
 SHELL := /bin/bash
 
@@ -7,6 +7,9 @@ PY   := $(VENV)/bin/python
 PIP  := $(VENV)/bin/pip
 DAG  := $(VENV)/bin/dagster
 
+MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+DAGSTER_HOME_DIR := $(MAKEFILE_DIR).dagster_home
+
 venv:
 	python3 -m venv $(VENV)
 	$(PY) -m pip install -U pip
@@ -14,5 +17,10 @@ venv:
 install: venv
 	$(PIP) install -e ".[dev,dagster]"
 
-dagster:
-	@$(DAG) dev -m telco_churn.definitions
+dagster-home:
+	mkdir -p "$(DAGSTER_HOME_DIR)"
+
+dagster: dagster-home
+	@echo "DAGSTER_HOME=$(DAGSTER_HOME_DIR)"
+	DAGSTER_HOME="$(DAGSTER_HOME_DIR)" $(DAG) dev -m telco_churn.definitions
+

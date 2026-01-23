@@ -2,7 +2,7 @@ import dagster as dg
 
 data = dg.define_asset_job(
     "data",
-    selection=dg.AssetSelection.keys("upload_train_data").upstream(),
+    selection=dg.AssetSelection.keys("upload_train_table").upstream(),
     executor_def=dg.in_process_executor,
 )
 
