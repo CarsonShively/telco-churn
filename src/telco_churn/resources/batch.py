@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 import dagster as dg
+from telco_churn.paths import REPO_ROOT
 
 @dataclass(frozen=True)
 class BatchRunContext:
@@ -20,8 +21,7 @@ class BatchContextResource(dg.ConfigurableResource):
     def get(self) -> BatchRunContext:
         batch_id = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_UTC")
 
-        repo_root = Path(self.repo_root).resolve()
-        reports_root = repo_root / self.reports_dirname
+        reports_root = REPO_ROOT / self.reports_dirname
         batch_root = reports_root / f"batch_{batch_id}"
         batch_root.mkdir(parents=True, exist_ok=True)
 
