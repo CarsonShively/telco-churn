@@ -1,4 +1,4 @@
-.PHONY: venv install dagster dagster-home
+.PHONY: venv install dagster dagster-home hf-login hf-logout
 
 SHELL := /bin/bash
 
@@ -6,6 +6,7 @@ VENV := .venv
 PY   := $(VENV)/bin/python
 PIP  := $(VENV)/bin/pip
 DAG  := $(VENV)/bin/dagster
+HF   := $(VENV)/bin/hf
 
 MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 DAGSTER_HOME_DIR := $(MAKEFILE_DIR).dagster_home
@@ -24,3 +25,8 @@ dagster: dagster-home
 	@echo "DAGSTER_HOME=$(DAGSTER_HOME_DIR)"
 	DAGSTER_HOME="$(DAGSTER_HOME_DIR)" $(DAG) dev -m telco_churn.definitions
 
+hf-login:
+	$(HF) auth login
+
+hf-logout:
+	$(HF) auth logout

@@ -10,6 +10,7 @@ from telco_churn.resources.duckdb import DuckDBResource
 from telco_churn.resources.data import HFDataResource
 from telco_churn.resources.model import HFModelResource
 from telco_churn.resources.batch import BatchContextResource
+from telco_churn.resources.train import TrainConfig
 from telco_churn.config import REPO_ID, REVISION
 
 
@@ -28,5 +29,6 @@ defs = dg.Definitions(
         "hf_model": HFModelResource(repo_id=REPO_ID, revision=REVISION),
         "batch_ctx": BatchContextResource(repo_root=".", reports_dirname="reports"),
         "db": DuckDBResource(path="data/telco.duckdb"),
+        "train_cfg": TrainConfig()
     },
 )

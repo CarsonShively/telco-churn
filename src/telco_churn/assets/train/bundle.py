@@ -1,6 +1,6 @@
 import dagster as dg
 from telco_churn.paths import REPO_ROOT
-from telco_churn.modeling.types import FitOut, TuningResult, TrainConfig
+from telco_churn.modeling.types import FitOut, TuningResult
 from telco_churn.modeling.run_id import make_run_id
 from telco_churn.modeling.bundle.model_artifact import ModelArtifact
 from telco_churn.modeling.bundle.write_bundle import write_bundle
@@ -10,20 +10,21 @@ from telco_churn.modeling.config import (
 )
 from telco_churn.config import CURRENT_ARTIFACT_VERSION
 
-@dg.asset(name="artifact_bundle")
+@dg.asset(name="artifact_bundle", required_resource_keys={"train_cfg"})
 def artifact_bundle(
+    context: dg.AssetExecutionContext, 
     fit_pipeline: FitOut,
     best_threshold: float,
     holdout_evaluation: dict[str, float],
     best_hyperparameters: TuningResult,
-    config: TrainConfig,
 ) -> BundleOut:
+    cfg = context.resources.train_cfg
     run_id = make_run_id()
 
     artifact_obj = ModelArtifact(
         run_id=run_id,
         artifact_version=CURRENT_ARTIFACT_VERSION,
-        model_type=config.model_type.value,
+        model_type=cfg.model_type.value,
         model=fit_pipeline.artifact,
         threshold=best_threshold,
     )
@@ -39,8 +40,8 @@ def artifact_bundle(
         "seed": SEED,
         "holdout_size": HOLDOUT_SIZE,
         "cv_splits": CV_SPLITS,
-        "n_trials": config.n_trials,
-        "model_type": config.model_type.value,
+        "n_trials": cfg.n_trials,
+        "model_type": cfg.model_type.value,
         "artifact_version": CURRENT_ARTIFACT_VERSION,
     }
 

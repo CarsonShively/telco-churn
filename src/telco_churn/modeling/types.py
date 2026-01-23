@@ -1,9 +1,7 @@
 import pandas as pd
-from enum import Enum
-import dagster as dg
 from pathlib import Path
 from dataclasses import dataclass
-from typing import TypedDict, Any
+from typing import Any
 from sklearn.model_selection import StratifiedKFold
 
 @dataclass(frozen=True)
@@ -18,16 +16,6 @@ class TTSCV:
 class TuningResult:
     best_params: dict[str, Any]
     cv_summary: dict[str, Any]
-    
-class ModelType(str, Enum):
-    lr = "lr"
-    lgbm = "lgbm"
-    xgb = "xgb"
-
-class TrainConfig(dg.Config):
-    model_type: ModelType = ModelType.lr
-    n_trials: int = 10
-    upload: bool = False
     
 @dataclass(frozen=True)
 class FitOut:
