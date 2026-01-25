@@ -10,10 +10,21 @@ def batch_scored_df(context: dg.AssetExecutionContext, batch_features_df: pd.Dat
     bundle = hf_model.get_model_bundle()
         
     proba = bundle.model.predict_proba(batch_features_df)[:, 1]
-    
-    return build_scored_df(
+    thr = float(bundle.threshold)
+
+    scored = build_scored_df(
         X=batch_features_df,
         proba=proba,
         batch_id=ctx.batch_id,
-        threshold=bundle.threshold,
+        threshold=thr,
     )
+
+    context.add_output_metadata({
+        "batch_id": str(ctx.batch_id),
+        "threshold": thr,
+        "rows": scored.shape[0],
+        "columns": scored.shape[1],
+        "preview": dg.MetadataValue.md(scored.head(5).to_markdown(index=False)),
+    })
+
+    return scored

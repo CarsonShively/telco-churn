@@ -30,4 +30,15 @@ def best_hyperparameters(context: dg.AssetExecutionContext, data_splits: TTSCV) 
         seed=SEED,
     )
 
+    context.add_output_metadata({
+        "model_type": str(cfg.model_type.value),
+        "n_trials": int(cfg.n_trials),
+        "primary_metric": str(PRIMARY_METRIC),
+        "metric_direction": str(METRIC_DIRECTION),
+        "seed": int(SEED),
+
+        "best_params": best_params,
+        "cv_summary_keys": list(cv_summary.keys()) if hasattr(cv_summary, "keys") else None,
+    })
+
     return TuningResult(best_params=best_params, cv_summary=cv_summary)

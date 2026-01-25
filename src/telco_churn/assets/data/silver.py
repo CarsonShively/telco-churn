@@ -18,4 +18,22 @@ def silver_data_table(context: dg.AssetExecutionContext, bronze_data_table: str)
         )
         ex.execute_script(sql)
 
-        return "silver.train_base"
+        table_name = "silver.train_base"
+
+        rows = con.execute(f"select count(*) from {table_name}").fetchone()[0]
+        cols = con.execute(f"describe {table_name}").fetchall()
+        preview_df = con.execute(f"select * from {table_name} limit 5").df()
+
+        context.add_output_metadata({
+            "db_path": dg.MetadataValue.path(str(db.db_path())),
+            "table": table_name,
+            "source_table": bronze_data_table,
+            "rows": rows,
+            "columns": len(cols),
+            "schema": dg.MetadataValue.md(
+                "\n".join([f"- `{name}`: {dtype}" for (name, dtype, *_rest) in cols])
+            ),
+            "preview": dg.MetadataValue.md(preview_df.to_markdown(index=False)),
+        })
+
+        return table_name

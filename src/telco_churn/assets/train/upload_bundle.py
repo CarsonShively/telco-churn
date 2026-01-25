@@ -7,5 +7,19 @@ def upload_bundle(context: dg.AssetExecutionContext, artifact_bundle: BundleOut)
     if cfg.upload:
         hf_model = context.resources.hf_model
         hf_model.bundle_upload(bundle_dir=artifact_bundle.bundle_dir, run_id=artifact_bundle.run_id)
+
+        context.add_output_metadata({
+            "uploaded": True,
+            "run_id": str(artifact_bundle.run_id),
+            "bundle_dir": dg.MetadataValue.path(str(artifact_bundle.bundle_dir)),
+            "result": "run uploaded",
+        })
         return "run uploaded"
+
+    context.add_output_metadata({
+        "uploaded": False,
+        "run_id": str(artifact_bundle.run_id),
+        "bundle_dir": dg.MetadataValue.path(str(artifact_bundle.bundle_dir)),
+        "result": "no upload, local only",
+    })
     return "no upload, local only"

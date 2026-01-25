@@ -18,4 +18,22 @@ def gold_batch_table(context: dg.AssetExecutionContext, silver_batch_table: str)
         )
         ex.execute_script(sql)
 
-        return "gold.batch_features"
+        table_name = "gold.batch_features"
+
+        rows = con.execute(f"select count(*) from {table_name}").fetchone()[0]
+        cols = con.execute(f"describe {table_name}").fetchall()
+        preview_df = con.execute(f"select * from {table_name} limit 5").df()
+
+        context.add_output_metadata({
+            "db_path": dg.MetadataValue.path(str(db.db_path())),
+            "table": table_name,
+            "source_table": silver_batch_table,
+            "rows": rows,
+            "columns": len(cols),
+            "schema": dg.MetadataValue.md(
+                "\n".join([f"- `{name}`: {dtype}" for (name, dtype, *_rest) in cols])
+            ),
+            "preview": dg.MetadataValue.md(preview_df.to_markdown(index=False)),
+        })
+
+        return table_name

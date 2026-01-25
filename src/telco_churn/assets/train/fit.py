@@ -16,4 +16,15 @@ def fit_pipeline(context: dg.AssetExecutionContext, data_splits: TTSCV, best_hyp
         y=data_splits.y_train,
         best_params=best_hyperparameters.best_params,
     )
+
+    context.add_output_metadata({
+        "model_type": str(cfg.model_type.value),
+        "seed": int(SEED),
+        "train_rows": int(data_splits.X_train.shape[0]),
+        "train_cols": int(data_splits.X_train.shape[1]),
+        "best_params": best_hyperparameters.best_params,
+        "feature_count": int(len(feature_names)),
+        "feature_names_preview": list(feature_names[:10]),
+    })
+
     return FitOut(artifact=artifact, feature_names=feature_names)
