@@ -1,7 +1,7 @@
 from . import (
     best_contender,
     champion,
-    promote,
+    execute_decision,
     promotion_decision,
     run_metrics,
 )
@@ -9,7 +9,7 @@ from . import (
 PROMOTION_ASSET_MODULES = [
     best_contender,
     champion,
-    promote,
+    execute_decision,
     promotion_decision,
     run_metrics,
 ]

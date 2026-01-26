@@ -1,19 +1,19 @@
 from . import (
     bronze,
+    churn_history,
     gold,
     join,
     labels,
-    raw_data,
     silver,
-    train_data,
+    upload_train,
 )
 
 DATA_ASSET_MODULES = [
     bronze,
-    raw_data,
+    churn_history,
     gold,
     join,
     labels,
     silver,
-    train_data,
+    upload_train,
 ]

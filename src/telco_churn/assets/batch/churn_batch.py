@@ -2,11 +2,11 @@ import os
 import pandas as pd
 import dagster as dg
 
-@dg.asset(name="raw_batch", required_resource_keys={"hf_data"})
-def raw_batch(context: dg.AssetExecutionContext) -> str:
-    """Incoming batch data."""
+@dg.asset(name="churn_batch", required_resource_keys={"hf_data"})
+def churn_batch(context: dg.AssetExecutionContext) -> str:
+    """Ingest batch data."""
     hf_data = context.resources.hf_data
-    local_path = hf_data.download_data("data/bronze/demo.parquet")
+    local_path = hf_data.download_data("data/bronze/churn_batch.parquet")
 
     file_bytes = os.path.getsize(local_path)
 

@@ -8,10 +8,10 @@ The goal is to mirror real-world ML workflows—**data pipelines, reproducible t
 
 ## Dagster Jobs
 
-1. **Data**
-   - Ingest raw churn history.
+1. **ETL**
+   - Ingest churn history.
    - Apply bronze -> silver -> gold transformations.
-   - Produce train-ready feature tables.
+   - Produce train-ready data tables.
 
 2. **Train**
    - Config-driven modeling produces trained artifacts and metadata.
@@ -23,7 +23,7 @@ The goal is to mirror real-world ML workflows—**data pipelines, reproducible t
    - Promote only if performance improves by an epsilon threshold.
 
 4. **Batch Report**
-   - Score a new batch partition of customer data.
+   - Score a new batch of customer data.
    - Emit a structured batch report including:
       - Churn risk buckets and customer priority ranks.
       - Decision codes and suggested actions for predicted churners.
@@ -44,11 +44,9 @@ This system uses **Hugging Face Hub** to store immutable artifact history.
 > **Safe by Default**
 >
 > All artifact upload flags are **disabled by default**.
-> This allows local dry runs and experimentation **without modifying any remote
-> dataset or model repositories**.
+> This allows local dry runs and experimentation without modifying any remote dataset or model repositories.
 >
-> Uploads must be explicitly enabled via configuration.
-> If you enable uploads, you must be authenticated to upload.
+> Uploads must be explicitly enabled via configuration and require authentication.
 
 ## Running the system
 ```bash
@@ -66,5 +64,6 @@ make dagster
 
 ## Planned System Improvements
 1. Partitioned batch data ingestion
-2. Scheduled Dagster jobs
-3. Dagster sensors for automated batch triggering
+2. Scheduled Dagster jobs 
+3. Dagster sensors for automated batch triggering 
+4. Evaluate alternative storage backends beyond Hugging Face Hub

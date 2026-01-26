@@ -3,8 +3,8 @@ from telco_churn.promotion.type import PromotionDecision, RunRow, ChampionRef, P
 from telco_churn.promotion.registry import write_champion_json
 from telco_churn.paths import REPO_ROOT
 
-@dg.asset(name="promote", required_resource_keys={"hf_model"})
-def promote(
+@dg.asset(name="execute_promotion_decision", required_resource_keys={"hf_model"})
+def execute_promotion_decision(
     context: dg.AssetExecutionContext,
     best_contender: RunRow,
     promotion_decision: PromotionDecision,

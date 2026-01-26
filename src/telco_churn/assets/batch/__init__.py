@@ -1,9 +1,9 @@
 from . import (
     action,
     bronze,
+    churn_batch,
     features,
     gold,
-    raw_batch,
     report,
     scored,
     silver,
@@ -13,7 +13,7 @@ from . import (
 
 BATCH_ASSET_MODULES = [
     action,
-    raw_batch,
+    churn_batch,
     bronze,
     features,
     gold,

@@ -5,7 +5,7 @@ import dagster as dg
 def train_data(context: dg.AssetExecutionContext) -> str:
     """Load train data from data archive."""
     hf_data = context.resources.hf_data
-    local_path = hf_data.download_data("data/gold/train.parquet")
+    local_path = hf_data.download_data("data/gold/churn_train.parquet")
 
     local_path = str(local_path)
 

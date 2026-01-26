@@ -3,11 +3,11 @@ import duckdb
 from telco_churn.data_layers.bronze.ingest import build_bronze
 
 @dg.asset(name="bronze_data_table", required_resource_keys={"db"})
-def bronze_data_table(context: dg.AssetExecutionContext, raw_data: str) -> str:
-    """Raw data to duckdb table."""
+def bronze_data_table(context: dg.AssetExecutionContext, churn_history: str) -> str:
+    """Historical churn data to DB table."""
     db = context.resources.db
     with duckdb.connect(str(db.db_path())) as con:
-        table_name = build_bronze(con, raw_data, "bronze.train")
+        table_name = build_bronze(con, churn_history, "bronze.train")
 
         rows = con.execute(f"select count(*) from {table_name}").fetchone()[0]
         cols = con.execute(f"describe {table_name}").fetchall()
@@ -16,7 +16,7 @@ def bronze_data_table(context: dg.AssetExecutionContext, raw_data: str) -> str:
         context.add_output_metadata({
             "db_path": dg.MetadataValue.path(str(db.db_path())),
             "table": table_name,
-            "source_path": raw_data,
+            "source_path": churn_history,
             "rows": rows,
             "columns": len(cols),
             "schema": dg.MetadataValue.md(

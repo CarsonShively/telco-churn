@@ -10,8 +10,8 @@ from telco_churn.io.hf import download_dataset_hf, upload_dataset_hf
 from telco_churn.config import REPO_ID, REVISION
 
 RAW_PATH_IN_REPO = "data/raw/churn.csv"
-TRAIN_PATH_IN_REPO = "data/bronze/train.parquet"
-DEMO_PATH_IN_REPO = "data/bronze/demo.parquet"
+TRAIN_PATH_IN_REPO = "data/bronze/churn_history.parquet"
+DEMO_PATH_IN_REPO = "data/bronze/churn_batch.parquet"
 
 def main():
     raw = download_dataset_hf(repo_id=REPO_ID, revision=REVISION, filename=RAW_PATH_IN_REPO)
@@ -29,8 +29,8 @@ def main():
     bronze_dir = Path("data") / "bronze"
     bronze_dir.mkdir(parents=True, exist_ok=True)
 
-    train_file = bronze_dir / "train.parquet"
-    demo_file  = bronze_dir / "demo.parquet"
+    train_file = bronze_dir / "churn_history.parquet"
+    demo_file  = bronze_dir / "churn_batch.parquet"
 
     train_df.to_parquet(train_file, index=False)
     demo_df.to_parquet(demo_file, index=False)

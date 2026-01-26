@@ -11,11 +11,11 @@ from telco_churn.db.executor import SQLExecutor
     config_schema={"upload": dg.Field(bool, default_value=False)},
 )
 def upload_train_table(context: dg.AssetExecutionContext, train_table: str) -> str:
-    """Upload model training ready data to hugging face data archive."""
+    """Upload model-ready train data to hugging face hub data archive."""
     db = context.resources.db
     hf_data = context.resources.hf_data
 
-    out_path = Path(REPO_ROOT / "data/gold/train.parquet")
+    out_path = Path(REPO_ROOT / "data/gold/churn_train.parquet")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     with duckdb.connect(str(db.db_path())) as con:
@@ -26,7 +26,7 @@ def upload_train_table(context: dg.AssetExecutionContext, train_table: str) -> s
     hf_path = None
 
     if context.op_config["upload"]:
-        hf_path = "data/gold/train.parquet"
+        hf_path = "data/gold/churn_train.parquet"
         hf_data.upload_data(local_path=str(out_path), hf_path=hf_path)
         uploaded = True
 

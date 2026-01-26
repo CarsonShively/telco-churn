@@ -1,11 +1,11 @@
 import os
 import dagster as dg
 
-@dg.asset(name="raw_data", required_resource_keys={"hf_data"})
-def raw_data(context: dg.AssetExecutionContext) -> str:
-    """Ingest raw data."""
+@dg.asset(name="churn_history", required_resource_keys={"hf_data"})
+def churn_history(context: dg.AssetExecutionContext) -> str:
+    """Ingest churn history data."""
     hf_data = context.resources.hf_data
-    local_path = hf_data.download_data("data/bronze/train.parquet")
+    local_path = hf_data.download_data("data/bronze/churn_history.parquet")
 
     local_path = str(local_path)
 

@@ -6,10 +6,10 @@ import dagster as dg
 
 from telco_churn.assets.batch import BATCH_ASSET_MODULES
 from telco_churn.assets.train import TRAIN_ASSET_MODULES
-from telco_churn.assets.data import DATA_ASSET_MODULES
+from telco_churn.assets.etl import DATA_ASSET_MODULES
 from telco_churn.assets.promotion import PROMOTION_ASSET_MODULES
 
-from telco_churn.jobs import data, batch, train, promotion
+from telco_churn.jobs import etl, batch, train, promotion
 from telco_churn.resources.duckdb import DuckDBResource
 from telco_churn.resources.data import HFDataResource
 from telco_churn.resources.model import HFModelResource
@@ -27,7 +27,7 @@ all_assets = dg.load_assets_from_modules(
 
 defs = dg.Definitions(
     assets=all_assets,
-    jobs=[data, batch, train, promotion],
+    jobs=[etl, batch, train, promotion],
     resources={
         "hf_data": HFDataResource(repo_id=REPO_ID, revision=REVISION),
         "hf_model": HFModelResource(repo_id=REPO_ID, revision=REVISION),
