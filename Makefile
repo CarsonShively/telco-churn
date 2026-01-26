@@ -6,7 +6,7 @@ VENV := .venv
 PY   := $(VENV)/bin/python
 PIP  := $(VENV)/bin/pip
 UV   := $(VENV)/bin/uv
-DAG  := $(VENV)/bin/dagster
+DG := $(VENV)/bin/dg
 HF   := $(VENV)/bin/hf
 
 MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
@@ -30,7 +30,7 @@ dagster-home:
 
 dagster: dagster-home
 	@echo "DAGSTER_HOME=$(DAGSTER_HOME_DIR)"
-	DAGSTER_HOME="$(DAGSTER_HOME_DIR)" $(DAG) dev -m telco_churn.definitions
+	DAGSTER_HOME="$(DAGSTER_HOME_DIR)" $(DG) dev -m telco_churn.definitions
 
 hf-login:
 	$(HF) auth login
