@@ -13,4 +13,6 @@ __pycache__/
 champion.json
 
 .dagster_home/
+!.dagster_home/
+.dagster_home/*
 !.dagster_home/dagster.yaml
