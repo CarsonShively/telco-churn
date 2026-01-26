@@ -8,6 +8,7 @@ def batch_action_df(
     batch_features_df: pd.DataFrame,
     batch_scored_df: pd.DataFrame,
 ) -> pd.DataFrame | None:
+    """Create batch suggested action dataframe."""
     hf_model = context.resources.hf_model
     bundle = hf_model.get_model_bundle()
 

@@ -7,6 +7,7 @@ FEATURES_SQL_FILE = "features.sql"
 
 @dg.asset(name="gold_data_table", required_resource_keys={"db"})
 def gold_data_table(context: dg.AssetExecutionContext, silver_data_table: str) -> str:
+    """Engineered features data table."""
     db = context.resources.db
     with duckdb.connect(str(db.db_path())) as con:
         ex = SQLExecutor(con)

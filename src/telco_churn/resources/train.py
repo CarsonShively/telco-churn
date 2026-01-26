@@ -1,3 +1,7 @@
+"""
+Train job config.
+"""
+
 import dagster as dg
 from enum import Enum
 

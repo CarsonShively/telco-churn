@@ -1,3 +1,7 @@
+"""
+Summarize batch report.
+"""
+
 from datetime import datetime, timezone
 import pandas as pd
 

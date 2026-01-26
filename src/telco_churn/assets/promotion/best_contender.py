@@ -5,6 +5,7 @@ from telco_churn.promotion.type import RunRow
 
 @dg.asset(name="best_contender")
 def best_contender(context: dg.AssetExecutionContext, run_metrics: list[RunRow]) -> RunRow:
+    """Select best contender from model runs archive."""
     best = get_best_contender(run_metrics)
 
     context.add_output_metadata({

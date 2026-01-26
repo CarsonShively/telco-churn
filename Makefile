@@ -1,4 +1,4 @@
-.PHONY: venv install install-dev lock upgrade dagster dagster-home hf-login hf-logout
+.PHONY: venv install install-dev lock dagster-home dagster hf-login hf-logout
 
 SHELL := /bin/bash
 

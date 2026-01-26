@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 from telco_churn.promotion.type import ChampionRef
 
-# same json write as bundle?
 def write_champion_json(
     ref: ChampionRef,
     *,

@@ -9,6 +9,7 @@ def promotion_decision(
     champion: Optional[dict[str, Any]],
     best_contender: RunRow,
 ) -> PromotionDecision:
+    """Compare current champion vs best contender and decide/explain decision."""
     contender_metrics = best_contender.metrics
     decision = decide_promotion(
         contender_metrics=contender_metrics,

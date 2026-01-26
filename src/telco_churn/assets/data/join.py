@@ -11,6 +11,7 @@ def train_table(
     gold_data_table: str,
     labels_table: str,
 ) -> str:
+    """Train ready data table."""
     db = context.resources.db
     with duckdb.connect(str(db.db_path())) as con:
         ex = SQLExecutor(con)

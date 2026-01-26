@@ -11,6 +11,7 @@ def batch_report(
     batch_action_df: pd.DataFrame,
     batch_summary: dict,
 ) -> dict:
+    """Assembled report on current batch."""
     batch_ctx = context.resources.batch_ctx
     ctx = batch_ctx.get()
 

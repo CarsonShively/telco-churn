@@ -19,6 +19,7 @@ def artifact_bundle(
     holdout_evaluation: dict[str, float],
     best_hyperparameters: TuningResult,
 ) -> BundleOut:
+    """Assemble trained artifact bundle."""
     cfg = context.resources.train_cfg
     run_id = make_run_id()
 

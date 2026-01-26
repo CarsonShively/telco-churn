@@ -1,3 +1,7 @@
+"""
+Data parquet to DB table.
+"""
+
 import duckdb
 from pathlib import Path
 

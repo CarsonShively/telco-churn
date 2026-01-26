@@ -8,6 +8,7 @@ def batch_summary(
     batch_scored_df: pd.DataFrame,
     batch_action_df: pd.DataFrame,
 ) -> dict:
+    """Batch results summary."""
     hf_model = context.resources.hf_model
     batch_ctx = context.resources.batch_ctx
     ctx = batch_ctx.get()

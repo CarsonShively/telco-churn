@@ -1,3 +1,7 @@
+"""
+Train asset types.
+"""
+
 import pandas as pd
 from pathlib import Path
 from dataclasses import dataclass

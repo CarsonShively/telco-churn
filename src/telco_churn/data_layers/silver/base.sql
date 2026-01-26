@@ -1,4 +1,4 @@
--- silver.base: normalized, validated, and deduplicated customer table built from bronze.raw.
+-- Normalized, validated, and deduplicated customer table.
 
 CREATE SCHEMA IF NOT EXISTS silver;
 

@@ -1,3 +1,7 @@
+"""
+Log regression data preprocessor.
+"""
+
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler

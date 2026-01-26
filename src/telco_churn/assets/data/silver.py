@@ -7,6 +7,7 @@ BASE_SQL_FILE = "base.sql"
 
 @dg.asset(name="silver_data_table", required_resource_keys={"db"})
 def silver_data_table(context: dg.AssetExecutionContext, bronze_data_table: str) -> str:
+    """Normalised and cleaned features data table."""
     db = context.resources.db
     with duckdb.connect(str(db.db_path())) as con:
         ex = SQLExecutor(con)

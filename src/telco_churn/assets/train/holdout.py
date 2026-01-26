@@ -11,6 +11,7 @@ def holdout_evaluation(
     fit_pipeline: FitOut,
     best_threshold: float,
 ) -> dict[str, float]:
+    """Evaluate on holdout split and get metrics."""
     metrics = project_metric_report()
 
     out = evaluate(

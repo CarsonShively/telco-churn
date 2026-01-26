@@ -29,7 +29,6 @@ dependencies = [
   "dagster-duckdb>=0.28,<0.29",
 ]
 
-
 [project.optional-dependencies]
 
 dev = [

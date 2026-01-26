@@ -1,3 +1,7 @@
+"""
+Scored batch dataframe.
+"""
+
 import pandas as pd
 
 def build_scored_df(

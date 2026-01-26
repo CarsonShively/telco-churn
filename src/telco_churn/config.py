@@ -1,4 +1,6 @@
-"""Project-wide constant paths and defaults for telco-churn pipelines."""
+"""
+Project-wide constants, paths, and defaults for telco-churn.
+"""
 
 REPO_ID = "Carson-Shively/telco-churn"
 REVISION = "main"

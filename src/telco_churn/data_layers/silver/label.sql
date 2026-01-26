@@ -1,4 +1,4 @@
--- silver.labels: customer-level churn label (0/1) keyed by customer_id from bronze.raw.
+-- Customer-level churn label (0/1) keyed by customer_id.
 
 CREATE SCHEMA IF NOT EXISTS silver;
 

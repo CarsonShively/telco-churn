@@ -1,3 +1,7 @@
+"""
+Build shap for prediction explanations.
+"""
+
 import numpy as np
 import shap
 

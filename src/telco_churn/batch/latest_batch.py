@@ -1,4 +1,7 @@
-from datetime import datetime, timezone
+"""
+Pointer to latest batch report.
+"""
+
 import json
 from pathlib import Path
 

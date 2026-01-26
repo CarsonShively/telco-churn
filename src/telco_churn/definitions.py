@@ -1,3 +1,7 @@
+"""
+Dagster definitions.
+"""
+
 import dagster as dg
 
 from telco_churn.assets.batch import BATCH_ASSET_MODULES

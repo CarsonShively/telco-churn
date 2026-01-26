@@ -7,6 +7,7 @@ from telco_churn.modeling.config import SEED
 
 @dg.asset(name="fit_pipeline", required_resource_keys={"train_cfg"})
 def fit_pipeline(context: dg.AssetExecutionContext, data_splits: TTSCV, best_hyperparameters: TuningResult) -> FitOut:
+    """Fit model on best hyperparameters."""
     cfg = context.resources.train_cfg
     trainer = make_trainer(cfg.model_type.value, seed=SEED)
 

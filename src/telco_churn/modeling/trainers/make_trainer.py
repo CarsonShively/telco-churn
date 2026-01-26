@@ -1,4 +1,4 @@
-"""Trainer registry and factory for telco-churn modeling pipelines."""
+"""Trainer registry and factory for modeling pipelines."""
 
 from __future__ import annotations
 

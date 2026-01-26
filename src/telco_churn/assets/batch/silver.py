@@ -7,6 +7,7 @@ BASE_SQL_FILE = "base.sql"
 
 @dg.asset(name="silver_batch_table", required_resource_keys={"db"})
 def silver_batch_table(context: dg.AssetExecutionContext, bronze_batch_table: str) -> str:
+    """Cleaned and normalised batch."""
     db = context.resources.db
     with duckdb.connect(str(db.db_path())) as con:
         ex = SQLExecutor(con)

@@ -13,7 +13,7 @@ from telco_churn.modeling.preprocessors.lr import preprocessor
 
 @dataclass(slots=True)
 class LRTrainer:
-    """Log Regression trainer implementation for the telco-churn modeling pipeline."""
+    """Log Regression trainer implementation."""
     seed: int = 42
     spec: dict = field(default_factory=load_feature_spec)
 

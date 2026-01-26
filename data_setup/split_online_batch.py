@@ -1,3 +1,7 @@
+"""
+Split initial data to simulate production like data setup.
+"""
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from pathlib import Path

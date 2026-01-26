@@ -8,6 +8,7 @@ from telco_churn.batch.latest_batch import write_latest_pointer
     config_schema={"upload": dg.Field(bool, default_value=False)},
 )
 def upload_batch_report(context: dg.AssetExecutionContext, batch_report: dict) -> dict:
+    """Upload batch report to hugging face reports archive."""
     if not context.op_config["upload"]:
         context.add_output_metadata({
             "uploaded": False,

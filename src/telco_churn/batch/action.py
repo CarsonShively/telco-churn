@@ -1,3 +1,7 @@
+"""
+Action report for batch.
+"""
+
 import pandas as pd
 
 from telco_churn.explainability.decision_codes import DECISION_CODES

@@ -10,6 +10,7 @@ def promote(
     promotion_decision: PromotionDecision,
     config: PromotionConfig,
 ):
+    """Excecute promotion decision."""
     hf_model = context.resources.hf_model
 
     if not promotion_decision.promote:

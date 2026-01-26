@@ -1,3 +1,7 @@
+"""
+Resolves the DuckDB database path.
+"""
+
 import dagster as dg
 from pathlib import Path
 

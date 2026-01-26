@@ -1,3 +1,7 @@
+"""
+Quantile-based threshold for a target flag rate.
+"""
+
 import numpy as np
 
 def tune_threshold(y_score, flag_rate=0.05):

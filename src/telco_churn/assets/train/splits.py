@@ -6,6 +6,7 @@ from telco_churn.modeling.types import TTSCV
 
 @dg.asset(name="data_splits")
 def data_splits(context: dg.AssetExecutionContext, train_data: str) -> TTSCV:
+    """Establish data splits: TTS and CV."""
     df = pd.read_parquet(train_data)
     y = df[TARGET_COL]
     X = df.drop(columns=[TARGET_COL])

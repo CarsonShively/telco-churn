@@ -1,84 +1,70 @@
 # telco-churn
 
-This project implements a **deterministic, production-style machine learning system** for customer churn prediction.  
-The goal is to mirror real-world ML workflows—**data pipelines, feature stores, reproducible training, and model promotion**—rather than notebook-only experimentation or ad-hoc tuning.
+This project is intended as a portfolio grade **ML batch system**. 
 
-The system is designed so that **models, features, and data artifacts are reproducible, comparable, and promotable** in a controlled way.
-
----
-
-## System Overview
-
-**End-to-end flow:**
-
-1. **Data Pipeline**
-   - Raw (bronze) → cleaned/typed (silver) → modeled (gold)
-
-2. **Feature Store Pipeline**
-   - Materializes features into Redis
-   - Ensures offline (training) and online (serving) feature parity by reusing the same feature definitions and transformations
-
-3. **Training Pipeline**
-   - Deterministic training and evaluation across model families
-   - Supports LR, XGBoost, and LightGBM under a consistent interface
-
-4. **Promotion Pipeline**
-   - Selects the best contender deterministically
-   - Evaluates against the current champion
-   - Promotes only when criteria are met
+The goal is to mirror real-world ML workflows—**data pipelines, reproducible training, model promotion, and result reporting**—rather than notebook-only experimentation or ad-hoc tuning.
 
 ---
 
-## Setup
+## Dagster Jobs
 
-## Create and activate a virtual environment
-python3 -m venv .venv
+1. **Data**
+   - Ingest raw churn history.
+   - Apply bronze -> silver -> gold transformations.
+   - Produce train-ready feature tables.
 
-source .venv/bin/activate
+2. **Train**
+   - Config-driven modeling produces trained artifacts and metadata.
+   - Supported models: Logistic Regression, XGBoost, LightGBM.
 
-## Install dependencies
-pip install -U pip
+3. **Promotion**
+   - Deterministically select the best contender. 
+   - Evaluate the best contender against the current champion.
+   - Promote only if performance improves by an epsilon threshold.
 
-pip install -e .
+4. **Batch Report**
+   - Score a new batch partition of customer data.
+   - Emit a structured batch report including:
+      - Churn risk buckets and customer priority ranks.
+      - Decision codes and suggested actions for predicted churners.
+      - Aggregate batch-level summaries.
 
-## Start the local demo app 
-python3 space/app.py
+---
 
-## Data pipeline
-python3 pipelines/data_pipeline.py
+## Artifact Storage
 
-python3 pipelines/data_pipeline.py --upload
+This system uses **Hugging Face Hub** to store immutable artifact history.
 
-## Feature store pipeline
-python3 pipelines/feature_store_pipeline.py
+   **dataset repository** 
+   - [link](https://huggingface.co/datasets/Carson-Shively/telco-churn)
 
-## Train pipeline - determinstic training and scoring accross models
-### Supported models
-- `lr`  — Logistic Regression
-- `xgb` — XGBoost
-- `lgb` — LightGBM
+   **model repository** 
+   - [link](https://huggingface.co/Carson-Shively/telco-churn)
 
-python3 pipelines/train_pipeline.py --model-type xgb
+> **Safe by Default**
+>
+> All artifact upload flags are **disabled by default**.
+> This allows local dry runs and experimentation **without modifying any remote
+> dataset or model repositories**.
+>
+> Uploads must be explicitly enabled via configuration.
+> If you enable uploads, you must be authenticated to upload.
 
-python3 pipelines/train_pipeline.py --model-type xgb --upload
+## Running the system
+```bash
+make install
+make dagster
+```
 
-## Promotion pipeline - Select the best contender and compare it against the current champion
-python3 pipelines/promotion_pipeline.py
+1. Open the URL printed in your terminal (usually http://127.0.0.1:3000)
+2. Navigate to **Jobs**
+3. Select a job
+4. Materialize the job
+5. Inspect asset-level metadata and artifacts in the Dagster UI
 
-python3 pipelines/promotion_pipeline.py --promote
 
 
-## External artifact storage
-
-This project uses a Hugging Face **dataset repository** and **model repository** as the artifact store for Parquet data and model runs .
-
-- Dataset repo: `Carson-Shively/telco-churn`
-- Model repo: `Carson-Shively/telco-churn`
-
-## HF Authentication
-huggingface-cli login
-
-## Feature Store Reasoning
-customer Churn is often handled via batch inference.  
-Here, a feature store is used to demonstrate online ML architecture and
-production-oriented system design.
+## Planned System Improvements
+1. Partitioned batch data ingestion
+2. Scheduled Dagster jobs
+3. Dagster sensors for automated batch triggering

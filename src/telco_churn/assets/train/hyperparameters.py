@@ -7,6 +7,7 @@ from telco_churn.modeling.trainers.make_trainer import make_trainer
 
 @dg.asset(name="best_hyperparameters", required_resource_keys={"train_cfg"})
 def best_hyperparameters(context: dg.AssetExecutionContext, data_splits: TTSCV) -> TuningResult:
+    """Run optuna search for best hyperparameters."""
     cfg = context.resources.train_cfg
     metrics = project_metric_report()
     primary_metric_fn = metrics[PRIMARY_METRIC]

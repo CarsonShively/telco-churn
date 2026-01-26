@@ -4,6 +4,7 @@ import pandas as pd
 
 @dg.asset(name="champion", required_resource_keys={"hf_model"})
 def champion(context: dg.AssetExecutionContext) -> Optional[dict[str, Any]]:
+    """Retrive current champion metrics from runs archive."""
     hf_model = context.resources.hf_model
     champion_ptr = hf_model.model_json(path_in_repo="champion.json")
 

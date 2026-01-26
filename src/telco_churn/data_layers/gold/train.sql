@@ -1,4 +1,4 @@
--- gold.train: final training dataset (gold.features joined with silver.labels on customer_id).
+-- Final training dataset (gold.features joined with silver.labels on customer_id).
 
 CREATE SCHEMA IF NOT EXISTS gold;
 

@@ -1,3 +1,7 @@
+"""
+Fit model with best params.
+"""
+
 from typing import Callable, Any
 import numpy as np
 from sklearn.pipeline import Pipeline

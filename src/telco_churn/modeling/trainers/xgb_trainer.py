@@ -13,7 +13,7 @@ from telco_churn.modeling.preprocessors.tree import preprocessor
 
 @dataclass(slots=True)
 class XGBTrainer:
-    """XGBoost trainer implementation for the telco-churn modeling pipeline."""
+    """XGBoost trainer implementation."""
     seed: int = 42
     spec: dict = field(default_factory=load_feature_spec)
 

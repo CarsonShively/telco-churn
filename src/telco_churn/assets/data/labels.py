@@ -7,6 +7,7 @@ LABEL_SQL_FILE = "label.sql"
 
 @dg.asset(name="labels_table", required_resource_keys={"db"})
 def labels_table(context: dg.AssetExecutionContext, bronze_data_table: str) -> str:
+    """Churn labels data table."""
     db = context.resources.db
     with duckdb.connect(str(db.db_path())) as con:
         ex = SQLExecutor(con)

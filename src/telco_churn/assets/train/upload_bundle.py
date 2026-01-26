@@ -3,6 +3,7 @@ from telco_churn.modeling.types import BundleOut
 
 @dg.asset(name="upload_bundle", required_resource_keys={"hf_model", "train_cfg"})
 def upload_bundle(context: dg.AssetExecutionContext, artifact_bundle: BundleOut) -> str:
+    """Upload run bundle to model runs archive."""
     cfg = context.resources.train_cfg
     if cfg.upload:
         hf_model = context.resources.hf_model

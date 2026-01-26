@@ -11,6 +11,7 @@ from telco_churn.db.executor import SQLExecutor
     config_schema={"upload": dg.Field(bool, default_value=False)},
 )
 def upload_train_table(context: dg.AssetExecutionContext, train_table: str) -> str:
+    """Upload model training ready data to hugging face data archive."""
     db = context.resources.db
     hf_data = context.resources.hf_data
 
