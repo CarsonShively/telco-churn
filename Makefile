@@ -1,7 +1,5 @@
 .PHONY: venv install install-dev lock dagster-home dagster hf-login hf-logout
 
-SHELL := /usr/bin/env bash
-
 VENV := .venv
 PY   := $(VENV)/bin/python
 PIP  := $(VENV)/bin/pip
